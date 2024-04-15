@@ -12,6 +12,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { createClient } from '@supabase/supabase-js';
+import { auth } from "@/auth";
 
 // Setting the ffmpeg and ffprobe paths
 ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH || '');
@@ -38,8 +39,19 @@ const elevenlabs = new ElevenLabsClient({
 });
 
 export async function POST(req: Request) {
-  console.log('Received request to generate meditation');  
+  console.log('Received request to generate meditation');
   const { aiProvider, duration, guidanceLevel, ttsProvider, voice } = await req.json();
+
+  // Retrieve the session using auth()
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.id) {
+    console.log('No session found or user ID is missing');
+    return new NextResponse(JSON.stringify({ error: "Not authorized" }), { status: 401 });
+  }
+
+  const userId = session.user.id; // This is the authenticated user's ID
+  console.log(`User ID: ${userId}`); // Log the user ID to the console
 
   // Define meditation duration and guidance level options and heuristics from Python script
   const durationOptions = { "2-5min": 4, "5-10min": 7, "10+min": 10 };
@@ -82,6 +94,7 @@ export async function POST(req: Request) {
 
   try {
     let meditationScript = '';
+    
     if (aiProvider === 'openai') {
         const response = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
@@ -182,33 +195,56 @@ export async function POST(req: Request) {
     fs.writeFileSync(concatFilePath, concatContent);
 
     return new Promise((resolve, reject) => {
-        ffmpeg()
-            .input(concatFilePath)
-            .inputOptions(['-f', 'concat', '-safe', '0'])
-            .outputOptions(['-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '192k'])  // Re-encode to ensure all files are uniform
-            .output(outputFilePath)
-            .on('end', async () => {
-              fs.unlinkSync(concatFilePath);  // Clean up temporary files
-              console.log('Concatenation complete.');
-          
-              // Read the file into a Buffer
-              const fileBuffer = fs.readFileSync(outputFilePath);
-          
-              // Upload the file to Supabase
-              const { data, error } = await supabase.storage.from('meditations').upload(outputFileName, fileBuffer);
-              if (error) {
-                  console.error('Error uploading file to Supabase:', error);
-                  reject(NextResponse.json({ error: 'Failed to upload meditation to Supabase. Please try again.' }, { status: 500 }));
-              } else {
-                  console.log('File uploaded to Supabase:', data);
-                  resolve(NextResponse.json({ audioUrl: `/meditations/${outputFileName}` }));
-              }
-          })
-            .on('error', (err) => {
-                fs.unlinkSync(concatFilePath);  // Clean up even on error
-                console.error('Error during concatenation:', err);
-                reject(NextResponse.json({ error: 'Failed to generate meditation. Please try again.' }, { status: 500 }));
-            })
+      ffmpeg()
+        .input(concatFilePath)
+        .inputOptions(['-f', 'concat', '-safe', '0'])
+        .outputOptions(['-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '192k'])  // Re-encode to ensure all files are uniform
+        .output(outputFilePath)
+        .on('end', async () => {
+          fs.unlinkSync(concatFilePath);  // Clean up temporary files
+          console.log('Concatenation complete.');
+
+          // Read the file into a Buffer
+          const fileBuffer = fs.readFileSync(outputFilePath);
+
+          // Upload the file to Supabase's private bucket
+          const { data, error } = await supabase.storage
+            .from('private_meditations')
+            .upload(`user_${userId}/${outputFileName}`, fileBuffer, {
+              cacheControl: '3600',
+              upsert: false,
+            });
+
+          if (!error) {
+            console.log('File uploaded to Supabase private bucket:', data);
+
+      // Insert a new row into the meditations table
+      const { data: meditationData, error: meditationError } = await supabase
+        .from('meditations')
+        .insert({
+          user_id: userId,
+          audio_path: `user_${userId}/${outputFileName}`,
+          duration: averageDuration,
+          created_at: new Date().toISOString(),
+        });
+
+      if (meditationError) {
+        console.error('Error inserting meditation into table:', meditationError);
+        reject(NextResponse.json({ error: 'Failed to save meditation. Please try again.' }, { status: 500 }));
+      } else {
+        console.log('Meditation inserted into table successfully');
+        resolve(NextResponse.json({ message: 'Meditation generated and stored successfully.' }));
+      }
+    } else {
+      console.error('Error uploading file to Supabase private bucket:', error);
+      reject(NextResponse.json({ error: 'Failed to upload meditation to Supabase. Please try again.' }, { status: 500 }));
+    }
+        })
+        .on('error', (err) => {
+          fs.unlinkSync(concatFilePath);  // Clean up even on error
+          console.error('Error during concatenation:', err);
+          reject(NextResponse.json({ error: 'Failed to generate meditation. Please try again.' }, { status: 500 }));
+        })
         .run();
     });
 
