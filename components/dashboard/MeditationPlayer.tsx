@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 
 interface MeditationPlayerProps {
   audioUrl: string;
+  onSave: () => void;
+  onDiscard: () => void;
 }
 
-const MeditationPlayer: React.FC<MeditationPlayerProps> = ({ audioUrl }) => {
+const MeditationPlayer: React.FC<MeditationPlayerProps> = ({ audioUrl, onSave, onDiscard }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -27,8 +29,8 @@ const MeditationPlayer: React.FC<MeditationPlayerProps> = ({ audioUrl }) => {
         </div>
       </div>
       <div className="flex justify-center space-x-4 mt-6">
-        <Button>Save to Library</Button>
-        <Button>Generate New</Button>
+        <Button onClick={onSave}>Save to Library</Button>
+        <Button onClick={onDiscard}>Discard</Button>
       </div>
     </div>
   );

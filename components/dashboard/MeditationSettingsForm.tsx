@@ -38,11 +38,11 @@ interface MeditationSettings {
 }
 
 interface MeditationSettingsFormProps {
-    onAudioUrlChange: (url: string) => void;
-  }
+  onMeditationGenerated: (id: string) => void;
+}
 
-const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onAudioUrlChange }) => {
-    const [formData, setFormData] = useState<MeditationSettings>({
+const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMeditationGenerated }) => {
+  const [formData, setFormData] = useState<MeditationSettings>({
     aiProvider: 'openai',
     duration: '2-5min',
     guidanceLevel: 'low',
@@ -75,9 +75,9 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onAudio
       }
       const result = await response.json();
       console.log('Received API response:', result);
-      const audioUrl = result.audioUrl;
+      const meditationId = result.meditationId;
       setAudioUrl(audioUrl);
-      onAudioUrlChange(audioUrl);
+      onMeditationGenerated(meditationId);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
       setErrorMessage('Failed to generate meditation. Please try again.');

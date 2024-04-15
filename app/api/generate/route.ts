@@ -4,15 +4,13 @@ import OpenAI from "openai";
 import axios from 'axios';
 import Anthropic from '@anthropic-ai/sdk';
 import { ElevenLabsClient, play } from "elevenlabs";
-//import ffmpeg from 'ffmpeg-static';
 import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
-import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 import { createClient } from '@supabase/supabase-js';
 import { auth } from "@/auth";
+import os from 'os';
 
 // Setting the ffmpeg and ffprobe paths
 ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH || '');
@@ -127,70 +125,68 @@ export async function POST(req: Request) {
 
     // Generate and concatenate meditation audio files with pauses
     const segments = meditationScript.split('---PAUSE---');
-    const meditationsDir = path.join(process.cwd(), 'public', 'meditations');
-    await fs.promises.mkdir(meditationsDir, { recursive: true });
-
     const audioFiles = [];
-    for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i];
-        const audioFileName = `segment-${i}-${Date.now()}.mp3`;
-        const audioFilePath = path.join(meditationsDir, audioFileName);
 
-        if (ttsProvider === 'openai') {
-            const audio = await openai.audio.speech.create({
-                model: "tts-1",
-                input: segment,
-                voice: voice,
-                response_format: 'mp3',
-            });
-            const buffer = Buffer.from(await audio.arrayBuffer());
-            await fs.promises.writeFile(audioFilePath, buffer);
-        } else if (ttsProvider === 'elevenlabs') {
-            const audio = await elevenlabs.generate({
-                voice: voice,
-                text: segment,
-                model_id: "eleven_monolingual_v1",
-                output_format: "mp3",
-            });
-            await fs.promises.writeFile(audioFilePath, audio);
-        } else {
-            throw new Error('Invalid TTS provider');
-        }
-        audioFiles.push(audioFilePath as never);
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      const audioFileName = `segment-${i}-${Date.now()}.mp3`;
+      const audioFilePath = path.join(os.tmpdir(), audioFileName);
+
+      if (ttsProvider === 'openai') {
+        const audio = await openai.audio.speech.create({
+          model: "tts-1",
+          input: segment,
+          voice: voice,
+          response_format: 'mp3',
+        });
+        const buffer = Buffer.from(await audio.arrayBuffer());
+        await fs.promises.writeFile(audioFilePath, buffer);
+      } else if (ttsProvider === 'elevenlabs') {
+        const audio = await elevenlabs.generate({
+          voice: voice,
+          text: segment,
+          model_id: "eleven_monolingual_v1",
+          output_format: "mp3",
+        });
+        await fs.promises.writeFile(audioFilePath, audio);
+      } else {
+        throw new Error('Invalid TTS provider');
+      }
+
+      audioFiles.push(audioFilePath as never);
     }
 
     // Generate a silent audio file to use as a pause in MP3 format
-    const silentAudioPath = path.join(meditationsDir, 'silent.mp3');
+    const silentAudioPath = path.join(os.tmpdir(), 'silent.mp3');
     await new Promise((resolve, reject) => {
-        ffmpeg()
-            .input('anullsrc') // Use anullsrc for generating silence
-            .inputFormat('lavfi') // Specify lavfi as the input format
-            .audioChannels(2) // Set to stereo
-            .audioFrequency(44100) // Use a standard frequency for MP3 files
-            .duration(pauseLengthMs / 1000) // Set the duration of silence
-            .output(silentAudioPath)
-            .audioCodec('libmp3lame') // Use the libmp3lame codec for MP3
-            .on('end', () => {
-                console.log('Silent audio file generated.');
-                resolve(true);
-            })
-            .on('error', (err) => {
-                console.error('Error generating silent audio:', err);
-                reject(err);
-            })
-            .run();
+      ffmpeg()
+        .input('anullsrc') // Use anullsrc for generating silence
+        .inputFormat('lavfi') // Specify lavfi as the input format
+        .audioChannels(2) // Set to stereo
+        .audioFrequency(44100) // Use a standard frequency for MP3 files
+        .duration(pauseLengthMs / 1000) // Set the duration of silence
+        .output(silentAudioPath)
+        .audioCodec('libmp3lame') // Use the libmp3lame codec for MP3
+        .on('end', () => {
+          console.log('Silent audio file generated.');
+          resolve(true);
+        })
+        .on('error', (err) => {
+          console.error('Error generating silent audio:', err);
+          reject(err);
+        })
+        .run();
     });
-
 
     // Concatenation using fluent-ffmpeg with re-encoding
     const outputFileName = `output-${Date.now()}.mp3`;
-    const outputFilePath = path.join(meditationsDir, outputFileName);
+    const outputFilePath = path.join(os.tmpdir(), outputFileName);
 
     // Create a temporary concat file to describe the concatenation process for ffmpeg
-    const concatFilePath = path.join(meditationsDir, 'concat.txt');
+    const concatFilePath = path.join(os.tmpdir(), 'concat.txt');
     const concatContent = audioFiles.map((file, index) => {
-        return `file '${path.resolve(file)}'\n` + 
-              (index < audioFiles.length - 1 ? `file '${path.resolve(silentAudioPath)}'\n` : '');
+      return `file '${path.resolve(file)}'\n` +
+        (index < audioFiles.length - 1 ? `file '${path.resolve(silentAudioPath)}'\n` : '');
     }).join('');
     fs.writeFileSync(concatFilePath, concatContent);
 
@@ -198,10 +194,10 @@ export async function POST(req: Request) {
       ffmpeg()
         .input(concatFilePath)
         .inputOptions(['-f', 'concat', '-safe', '0'])
-        .outputOptions(['-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '192k'])  // Re-encode to ensure all files are uniform
+        .outputOptions(['-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '192k']) // Re-encode to ensure all files are uniform
         .output(outputFilePath)
         .on('end', async () => {
-          fs.unlinkSync(concatFilePath);  // Clean up temporary files
+          fs.unlinkSync(concatFilePath); // Clean up temporary files
           console.log('Concatenation complete.');
 
           // Read the file into a Buffer
@@ -218,38 +214,39 @@ export async function POST(req: Request) {
           if (!error) {
             console.log('File uploaded to Supabase private bucket:', data);
 
-      // Insert a new row into the meditations table
-      const { data: meditationData, error: meditationError } = await supabase
-        .from('meditations')
-        .insert({
-          user_id: userId,
-          audio_path: `user_${userId}/${outputFileName}`,
-          duration: averageDuration,
-          created_at: new Date().toISOString(),
-        });
+            // Insert a new row into the meditations table
+            const { data: meditationData, error: meditationError } = await supabase
+              .from('meditations')
+              .insert({
+                user_id: userId,
+                audio_path: `user_${userId}/${outputFileName}`,
+                duration: averageDuration,
+                created_at: new Date().toISOString(),
+              })
+              .select('id');
 
-      if (meditationError) {
-        console.error('Error inserting meditation into table:', meditationError);
-        reject(NextResponse.json({ error: 'Failed to save meditation. Please try again.' }, { status: 500 }));
-      } else {
-        console.log('Meditation inserted into table successfully');
-        resolve(NextResponse.json({ message: 'Meditation generated and stored successfully.' }));
-      }
-    } else {
-      console.error('Error uploading file to Supabase private bucket:', error);
-      reject(NextResponse.json({ error: 'Failed to upload meditation to Supabase. Please try again.' }, { status: 500 }));
-    }
+            if (meditationError) {
+              console.error('Error inserting meditation into table:', meditationError);
+              reject(NextResponse.json({ error: 'Failed to save meditation. Please try again.' }, { status: 500 }));
+            } else {
+              console.log('Meditation inserted into table successfully');
+              const meditationId = meditationData[0].id; // Get the generated meditation ID
+              resolve(NextResponse.json({ message: 'Meditation generated and stored successfully.', meditationId }));
+            }
+          } else {
+            console.error('Error uploading file to Supabase private bucket:', error);
+            reject(NextResponse.json({ error: 'Failed to upload meditation to Supabase. Please try again.' }, { status: 500 }));
+          }
         })
         .on('error', (err) => {
-          fs.unlinkSync(concatFilePath);  // Clean up even on error
+          fs.unlinkSync(concatFilePath); // Clean up even on error
           console.error('Error during concatenation:', err);
           reject(NextResponse.json({ error: 'Failed to generate meditation. Please try again.' }, { status: 500 }));
         })
         .run();
     });
-
-} catch (error) {
+  } catch (error) {
     console.error('Error generating meditation:', error);
     return NextResponse.json({ error: 'Failed to generate meditation. Please try again.' }, { status: 500 });
-}
+  }
 }
