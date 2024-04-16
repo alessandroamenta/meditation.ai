@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/session"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { DashboardShell } from "@/components/dashboard/shell"
 import { UserNameForm } from "@/components/forms/user-name-form"
+import MeditationsListWrapper from "@/components/dashboard/MeditationsListWrapper"
 
 export const metadata = {
   title: "Meditations",
@@ -21,11 +22,10 @@ export default async function SettingsPage() {
     <DashboardShell>
       <DashboardHeader
         heading="Meditations"
-        text="Manage meditations"
+        text="Your Meditation Library"
       />
-      <div className="grid gap-10">
-        <UserNameForm user={{ id: user.id, name: user.name || "" }} />
-      </div>
+      <MeditationsListWrapper />
+
     </DashboardShell>
   )
 }

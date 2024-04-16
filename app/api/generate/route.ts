@@ -36,6 +36,23 @@ const elevenlabs = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY,
 });
 
+// Helper function to get the duration of an audio file
+const getAudioDuration = async (audioFilePath) => {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(audioFilePath, (err, metadata) => {
+      if (err) {
+        reject(err);
+      } else {
+        const durationSecs = metadata.format.duration as number;
+        const minutes = Math.floor(durationSecs / 60);
+        const seconds = Math.floor(durationSecs % 60);
+        const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        resolve(formattedDuration);
+      }
+    });
+  });
+};
+
 export async function POST(req: Request) {
   console.log('Received request to generate meditation');
   const { aiProvider, duration, guidanceLevel, ttsProvider, voice } = await req.json();
@@ -179,7 +196,7 @@ export async function POST(req: Request) {
     });
 
     // Concatenation using fluent-ffmpeg with re-encoding
-    const outputFileName = `output-${Date.now()}.mp3`;
+    const outputFileName = `meditation-sesh-${Date.now()}.mp3`;
     const outputFilePath = path.join(os.tmpdir(), outputFileName);
 
     // Create a temporary concat file to describe the concatenation process for ffmpeg
@@ -200,6 +217,9 @@ export async function POST(req: Request) {
           fs.unlinkSync(concatFilePath); // Clean up temporary files
           console.log('Concatenation complete.');
 
+          // Get the duration of the generated audio file
+          const duration = await getAudioDuration(outputFilePath);
+
           // Read the file into a Buffer
           const fileBuffer = fs.readFileSync(outputFilePath);
 
@@ -219,8 +239,8 @@ export async function POST(req: Request) {
               .from('meditations')
               .insert({
                 user_id: userId,
-                audio_path: `user_${userId}/${outputFileName}`,
-                duration: averageDuration,
+                audio_path: outputFileName,
+                duration: duration,
                 created_at: new Date().toISOString(),
               })
               .select('id');
