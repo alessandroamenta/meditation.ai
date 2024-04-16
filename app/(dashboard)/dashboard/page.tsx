@@ -20,7 +20,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Dashboard" text="Create and manage content.">
+      <DashboardHeader heading="Dashboard" text="Create any meditation with AI.">
         <Button>Fake button</Button>
       </DashboardHeader>
       <div>
