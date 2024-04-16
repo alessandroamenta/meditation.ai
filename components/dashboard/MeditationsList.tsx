@@ -31,6 +31,28 @@ const MeditationsList = () => {
       });
   };
 
+  const fetchMeditationAudio = async (meditationId: string) => {
+    try {
+      const response = await fetch(`/api/get-meditation-audio?meditationId=${meditationId}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      return data.signedUrl;
+    } catch (error) {
+      console.error('Error fetching meditation audio:', error);
+      setError('Failed to fetch meditation audio');
+      return null;
+    }
+  };
+
+  const handlePlayMeditation = async (meditation: Meditation) => {
+    const signedUrl = await fetchMeditationAudio(meditation.id);
+    if (signedUrl) {
+      setCurrentMeditation({ ...meditation, signedUrl });
+    }
+  };
+
   const deleteMeditation = async (meditationId: string) => {
     try {
       const response = await fetch(`/api/supabase?meditationId=${meditationId}`, {
@@ -95,8 +117,8 @@ const MeditationsList = () => {
               <div className="flex items-center gap-2 col-span-5">
                 <PlayIcon
                   className="h-6 w-6 text-gray-500 dark:text-gray-400 cursor-pointer"
-                  onClick={() => setCurrentMeditation(meditation)}
-                />
+                  onClick={() => handlePlayMeditation(meditation)}
+                  />
                 <div className="grid grid-cols-1 gap-1">
                   <h3 className="font-semibold cursor-pointer">{meditation.audio_path}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{meditation.duration}</p>
