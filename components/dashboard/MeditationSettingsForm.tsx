@@ -2,7 +2,6 @@
 "use client"
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import MeditationPlayer from "@/components/dashboard/MeditationPlayer";
 import { Label } from "@/components/ui/label";
 import { Toggle } from "@/components/ui/toggle";
 import { Oval } from 'react-loader-spinner';
@@ -214,7 +213,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
               strokeWidth={4}
               strokeWidthSecondary={4}
             />
-            <span className="ml-2">Creating your meditation...just a few secs, for now: just breath and relax🧘‍♀️✨</span>
+            <span className="ml-2">Creating your meditation...just a few secs, breath and relax🧘‍♀️✨</span>
           </div>
         ) : (
           'Generate Meditation'

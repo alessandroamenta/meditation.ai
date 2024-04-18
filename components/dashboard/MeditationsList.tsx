@@ -8,7 +8,15 @@ interface Meditation {
   signedUrl: string;
 }
 
-const MeditationsList = () => {
+interface MeditationsListProps {
+    onPlayMeditation: (meditation: {
+      id: string;
+      signedUrl: string;
+      display_name: string;
+    }) => void;
+  }
+
+const MeditationsList: React.FC<MeditationsListProps> = ({ onPlayMeditation }) => {
   const [meditations, setMeditations] = useState<Meditation[]>([]);
   const [currentMeditation, setCurrentMeditation] = useState<Meditation | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +66,11 @@ const MeditationsList = () => {
   const handlePlayMeditation = async (meditation: Meditation) => {
     const signedUrl = await fetchMeditationAudio(meditation.id);
     if (signedUrl) {
-      setCurrentMeditation({ ...meditation, signedUrl });
+      onPlayMeditation({
+        id: meditation.id,
+        signedUrl,
+        display_name: meditation.display_name,
+      });
     }
   };
 
@@ -142,25 +154,25 @@ const MeditationsList = () => {
                     onClick={() => handlePlayMeditation(meditation)}
                   />
                   <div className="grid grid-cols-1 gap-1">
-                  {editingMeditationId === meditation.id ? (
-                    <input
+                    {editingMeditationId === meditation.id ? (
+                      <input
                         type="text"
                         value={editedMeditationName}
                         onChange={(e) => setEditedMeditationName(e.target.value)}
                         onBlur={handleRenameMeditation}
                         onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
+                          if (e.key === 'Enter') {
                             handleRenameMeditation();
-                        } else if (e.key === 'Escape') {
+                          } else if (e.key === 'Escape') {
                             setEditingMeditationId(null);
                             setEditedMeditationName('');
-                        }
+                          }
                         }}
                         className="font-semibold border-b border-gray-300 focus:outline-none focus:border-blue-500 w-full"
                         style={{ width: `${editedMeditationName.length}ch` }}
-                    />
+                      />
                     ) : (
-                    <h3 className="font-semibold">{meditation.display_name}</h3>
+                      <h3 className="font-semibold">{meditation.display_name}</h3>
                     )}
                     <p className="text-sm text-gray-500 dark:text-gray-400">{meditation.duration}</p>
                   </div>
@@ -193,29 +205,10 @@ const MeditationsList = () => {
           </div>
         )}
       </main>
-      {currentMeditation && (
-        <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-4">
-              <PlayIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
-              <div className="flex flex-col">
-                <h3 className="font-semibold">Now Playing</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                {currentMeditation.display_name} - {currentMeditation.duration}
-                </p>
-              </div>
-            </div>
-            <div>
-              <audio controls autoPlay src={currentMeditation.signedUrl}>
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
+
 
 
 function PlayIcon(props) {

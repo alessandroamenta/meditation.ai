@@ -31,11 +31,13 @@ const MeditationSection: React.FC = () => {
     <>
       <MeditationSettingsForm onMeditationGenerated={handleMeditationGenerated} />
       {hasNewAudio && (
-        <MeditationPlayer
-          audioUrl={audioUrl}
-          onSave={handleSaveMeditation}
-          onDiscard={handleDiscardMeditation}
-        />
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg p-4 max-w-md mx-auto h-auto">
+          <MeditationPlayer
+            audioUrl={audioUrl}
+            onSave={handleSaveMeditation}
+            onDiscard={handleDiscardMeditation}
+          />
+        </div>
       )}
     </>
   );
