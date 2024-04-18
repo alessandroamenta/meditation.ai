@@ -240,6 +240,7 @@ export async function POST(req: Request) {
               .insert({
                 user_id: userId,
                 audio_path: outputFileName,
+                display_name: outputFileName.replace('.mp3', ''),
                 duration: duration,
                 created_at: new Date().toISOString(),
               })

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 interface Meditation {
   id: string;
   audio_path: string;
+  display_name: string;
   duration: string;
   signedUrl: string;
 }
@@ -11,6 +12,8 @@ const MeditationsList = () => {
   const [meditations, setMeditations] = useState<Meditation[]>([]);
   const [currentMeditation, setCurrentMeditation] = useState<Meditation | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [editingMeditationId, setEditingMeditationId] = useState<string | null>(null);
+  const [editedMeditationName, setEditedMeditationName] = useState<string>('');
 
   useEffect(() => {
     fetchMeditations();
@@ -24,13 +27,15 @@ const MeditationsList = () => {
         }
         return response.json();
       })
-      .then(setMeditations)
+      .then((data) => {
+        setMeditations(data);
+      })
       .catch((error) => {
         setError('Failed to fetch meditations');
         console.error('Error fetching meditations:', error);
       });
   };
-
+  
   const fetchMeditationAudio = async (meditationId: string) => {
     try {
       const response = await fetch(`/api/get-meditation-audio?meditationId=${meditationId}`);
@@ -58,7 +63,6 @@ const MeditationsList = () => {
       const response = await fetch(`/api/supabase?meditationId=${meditationId}`, {
         method: 'DELETE',
       });
-
       if (response.ok) {
         setMeditations((prevMeditations) =>
           prevMeditations.filter((meditation) => meditation.id !== meditationId)
@@ -73,24 +77,26 @@ const MeditationsList = () => {
     }
   };
 
-  const renameMeditation = async (meditationId: string) => {
-    const newName = prompt('Enter a new name for the meditation:');
-    if (newName) {
+  const handleRenameMeditation = async () => {
+    if (editingMeditationId && editedMeditationName) {
       try {
-        const response = await fetch(`/api/supabase?meditationId=${meditationId}`, {
+        const response = await fetch(`/api/supabase?meditationId=${editingMeditationId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ newName }),
+          body: JSON.stringify({ newName: editedMeditationName }),
         });
-  
         if (response.ok) {
           setMeditations((prevMeditations) =>
             prevMeditations.map((meditation) =>
-              meditation.id === meditationId ? { ...meditation, audio_path: newName } : meditation
+              meditation.id === editingMeditationId
+                ? { ...meditation, display_name: editedMeditationName }
+                : meditation
             )
           );
+          setEditingMeditationId(null);
+          setEditedMeditationName('');
         } else {
           setError('Failed to rename meditation');
         }
@@ -101,6 +107,8 @@ const MeditationsList = () => {
     }
   };
 
+
+
   return (
     <div className="flex flex-col w-full min-h-screen">
       <main className="flex-1 flex flex-col gap-4 p-4">
@@ -108,45 +116,74 @@ const MeditationsList = () => {
           <h1 className="text-2xl font-bold">Meditation</h1>
           {error && <p className="text-red-500">{error}</p>}
         </div>
-        <div className="flex flex-col gap-2">
-          {meditations.map((meditation) => (
-            <div
-              key={meditation.id}
-              className="grid grid-cols-1 md:grid-cols-6 items-center gap-4 p-4 rounded-lg border hover:bg-gray-100/40 transition-all dark:hover:bg-gray-800/40"
-            >
-              <div className="flex items-center gap-2 col-span-5">
-                <PlayIcon
-                  className="h-6 w-6 text-gray-500 dark:text-gray-400 cursor-pointer"
-                  onClick={() => handlePlayMeditation(meditation)}
+        {meditations.length === 0 ? (
+          <div className="text-center">
+            <p className="text-lg">You have yet to generate your first meditation.</p>
+            <p className="text-lg">Go to the dashboard, create your meditation, and chill out.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {meditations.map((meditation) => (
+              <div
+                key={meditation.id}
+                className="grid grid-cols-1 md:grid-cols-6 items-center gap-4 p-4 rounded-lg border hover:bg-gray-100/40 transition-all dark:hover:bg-gray-800/40"
+              >
+                <div className="flex items-center gap-2 col-span-5">
+                  <PlayIcon
+                    className="h-6 w-6 text-gray-500 dark:text-gray-400 cursor-pointer"
+                    onClick={() => handlePlayMeditation(meditation)}
                   />
-                <div className="grid grid-cols-1 gap-1">
-                  <h3 className="font-semibold cursor-pointer">{meditation.audio_path}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{meditation.duration}</p>
+                  <div className="grid grid-cols-1 gap-1">
+                  {editingMeditationId === meditation.id ? (
+                    <input
+                        type="text"
+                        value={editedMeditationName}
+                        onChange={(e) => setEditedMeditationName(e.target.value)}
+                        onBlur={handleRenameMeditation}
+                        onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleRenameMeditation();
+                        } else if (e.key === 'Escape') {
+                            setEditingMeditationId(null);
+                            setEditedMeditationName('');
+                        }
+                        }}
+                        className="font-semibold border-b border-gray-300 focus:outline-none focus:border-blue-500 w-full"
+                        style={{ width: `${editedMeditationName.length}ch` }}
+                    />
+                    ) : (
+                    <h3 className="font-semibold">{meditation.display_name}</h3>
+                    )}
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{meditation.duration}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex justify-end col-span-1 space-x-2">
-                <button
+                <div className="flex justify-end col-span-1 space-x-2">
+                  <button
                     className="relative group"
-                    onClick={() => renameMeditation(meditation.id)}
-                >
+                    onClick={() => {
+                      setEditingMeditationId(meditation.id);
+                      setEditedMeditationName(meditation.display_name);
+                    }}
+                  >
                     <PencilIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-500" />
                     <span className="absolute top-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Rename
+                      Rename
                     </span>
-                </button>
-                <button
+                  </button>
+                  <button
                     className="relative group"
                     onClick={() => deleteMeditation(meditation.id)}
-                >
+                  >
                     <TrashIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-500" />
                     <span className="absolute top-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Delete
+                      Delete
                     </span>
-                </button>
+                  </button>
                 </div>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </main>
       {currentMeditation && (
         <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
@@ -156,7 +193,7 @@ const MeditationsList = () => {
               <div className="flex flex-col">
                 <h3 className="font-semibold">Now Playing</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {currentMeditation.audio_path} - {currentMeditation.duration}
+                {currentMeditation.display_name} - {currentMeditation.duration}
                 </p>
               </div>
             </div>

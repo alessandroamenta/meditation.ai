@@ -1,3 +1,4 @@
+// app/api/get-meditation-audio/route.ts
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { auth } from "@/auth";
@@ -14,14 +15,11 @@ export async function GET(req: Request) {
     return new NextResponse(JSON.stringify({ error: "Not authorized" }), { status: 401 });
   }
   const userId = session.user.id;
-
   const { searchParams } = new URL(req.url);
   const meditationId = searchParams.get('meditationId');
-
   if (!meditationId) {
     return NextResponse.json({ error: 'Meditation ID is required.' }, { status: 400 });
   }
-
   try {
     const { data: meditationData, error: meditationError } = await supabase
       .from('meditations')
@@ -38,7 +36,6 @@ export async function GET(req: Request) {
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from('private_meditations')
       .createSignedUrl(`user_${userId}/${meditationData.audio_path}`, 60 * 60);
-
 
     if (signedUrlError) {
       console.error('Error creating signed URL:', signedUrlError);
@@ -110,67 +107,39 @@ export async function DELETE(req: Request) {
     }
   }
 
-export async function PUT(req: Request) {
-const session = await auth();
-if (!session || !session.user || !session.user.id) {
-    console.log('No session found or user ID is missing');
-    return new NextResponse(JSON.stringify({ error: "Not authorized" }), { status: 401 });
-}
-
-const userId = session.user.id;
-const { searchParams } = new URL(req.url);
-const meditationId = searchParams.get('meditationId');
-if (!meditationId) {
-    return NextResponse.json({ error: 'Meditation ID is required.' }, { status: 400 });
-}
-
-const { newName } = await req.json();
-if (!newName) {
-    return NextResponse.json({ error: 'New name is required.' }, { status: 400 });
-}
-
-try {
-    const { data: meditationData, error: meditationError } = await supabase
-      .from('meditations')
-      .select('audio_path')
-      .eq('id', meditationId)
-      .eq('user_id', userId)
-      .single();
-
-    if (meditationError) {
-      console.error('Error retrieving meditation data:', meditationError);
-      return NextResponse.json({ error: 'Failed to retrieve meditation data.' }, { status: 500 });
+  export async function PUT(req: Request) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      console.log('No session found or user ID is missing');
+      return new NextResponse(JSON.stringify({ error: "Not authorized" }), { status: 401 });
     }
-
-    const oldAudioPath = `user_${userId}/${meditationData.audio_path}`;
-    const newAudioPath = `user_${userId}/${newName}.mp3`;
-
-    // Move the audio file to the new path in the storage bucket
-    const { data: moveData, error: moveError } = await supabase.storage
-      .from('private_meditations')
-      .move(oldAudioPath, newAudioPath);
-
-    if (moveError) {
-      console.error('Error moving audio file:', moveError);
-      return NextResponse.json({ error: 'Failed to move audio file.' }, { status: 500 });
+    const userId = session.user.id;
+    const { searchParams } = new URL(req.url);
+    const meditationId = searchParams.get('meditationId');
+    if (!meditationId) {
+      return NextResponse.json({ error: 'Meditation ID is required.' }, { status: 400 });
     }
-
-    // Update the audio_path in the meditations table
-    const { data: updateData, error: updateError } = await supabase
-      .from('meditations')
-      .update({ audio_path: `${newName}.mp3` })
-      .eq('id', meditationId)
-      .eq('user_id', userId);
-
-    if (updateError) {
-      console.error('Error updating meditation name:', updateError);
-      return NextResponse.json({ error: 'Failed to update meditation name.' }, { status: 500 });
+    const { newName } = await req.json();
+    if (!newName) {
+      return NextResponse.json({ error: 'New name is required.' }, { status: 400 });
     }
-
-    console.log('Meditation renamed successfully.');
-    return NextResponse.json({ message: 'Meditation renamed successfully.' });
-  } catch (error) {
-    console.error('Error renaming meditation:', error);
-    return NextResponse.json({ error: 'Failed to rename meditation.' }, { status: 500 });
+    try {
+      // Update the display_name in the meditations table
+      const { data: updateData, error: updateError } = await supabase
+        .from('meditations')
+        .update({ display_name: newName })
+        .eq('id', meditationId)
+        .eq('user_id', userId);
+  
+      if (updateError) {
+        console.error('Error updating meditation name:', updateError);
+        return NextResponse.json({ error: 'Failed to update meditation name.' }, { status: 500 });
+      }
+  
+      console.log('Meditation renamed successfully.');
+      return NextResponse.json({ message: 'Meditation renamed successfully.' });
+    } catch (error) {
+      console.error('Error renaming meditation:', error);
+      return NextResponse.json({ error: 'Failed to rename meditation.' }, { status: 500 });
+    }
   }
-}
