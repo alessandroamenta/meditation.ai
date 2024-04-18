@@ -14,12 +14,14 @@ const MeditationsList = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingMeditationId, setEditingMeditationId] = useState<string | null>(null);
   const [editedMeditationName, setEditedMeditationName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetchMeditations();
   }, []);
 
   const fetchMeditations = () => {
+    setIsLoading(true);
     fetch('/api/get-all-meditations')
       .then((response) => {
         if (!response.ok) {
@@ -29,10 +31,12 @@ const MeditationsList = () => {
       })
       .then((data) => {
         setMeditations(data);
+        setIsLoading(false);
       })
       .catch((error) => {
         setError('Failed to fetch meditations');
         console.error('Error fetching meditations:', error);
+        setIsLoading(false);
       });
   };
   
@@ -116,10 +120,14 @@ const MeditationsList = () => {
           <h1 className="text-2xl font-bold">Meditation</h1>
           {error && <p className="text-red-500">{error}</p>}
         </div>
-        {meditations.length === 0 ? (
+        {isLoading ? (
           <div className="text-center">
-            <p className="text-lg">You have yet to generate your first meditation.</p>
-            <p className="text-lg">Go to the dashboard, create your meditation, and chill out.</p>
+            <p className="text-lg">Loading meditations... 🧘‍♀️</p>
+          </div>
+        ) : meditations.length === 0 ? (
+          <div className="text-center">
+            <p className="text-lg">You haven't generated any meditations yet. 😌🌿</p>
+            <p className="text-lg">Head over to the dashboard, create your first meditation, and chill out. 🎧💆‍♂️</p>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
