@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import MeditationPlayer from "@/components/dashboard/MeditationPlayer";
 import { Label } from "@/components/ui/label";
 import { Toggle } from "@/components/ui/toggle";
+import { Oval } from 'react-loader-spinner';
 
 const aiProviderOptions = ['openai', 'anthropic'];
 const durationOptions = ['2-5min', '5-10min', '10+min'];
@@ -89,7 +90,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
   return (
     <form onSubmit={handleSubmit} className="grid gap-4 p-6 rounded-lg border border-gray-200 dark:border-gray-800">
       <div className="flex items-center gap-4">
-        <Label htmlFor="ai-provider">AI Provider</Label>
+       <Label htmlFor="ai-provider">🤖 AI Model</Label>
         <div className="grid grid-cols-2 gap-4">
           {aiProviderOptions.map(option => (
             <Toggle
@@ -105,7 +106,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <Label htmlFor="duration">Duration</Label>
+        <Label htmlFor="duration">⏳ Meditation Length</Label>
         <div className="grid grid-cols-3 gap-4">
           {durationOptions.map(option => (
             <Toggle
@@ -121,7 +122,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <Label htmlFor="guidance-level">Guidance Level</Label>
+        <Label htmlFor="guidance-level">🧘‍♀️ Guidance Amount</Label>
         <div className="grid grid-cols-3 gap-4">
           {guidanceOptions.map(option => (
             <Toggle
@@ -137,7 +138,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <Label htmlFor="tts-provider">TTS Provider</Label>
+        <Label htmlFor="tts-provider">🎙️ Voice Provider</Label>
         <div className="grid grid-cols-2 gap-4">
           {ttsProviderOptions.map(option => (
             <Toggle
@@ -153,7 +154,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <Label htmlFor="voice">Voice</Label>
+        <Label htmlFor="voice">🗣️ Voice Selection</Label>
         <div className="grid grid-cols-3 gap-4">
           {voiceOptions[formData.ttsProvider].map(option => (
             <Toggle
@@ -169,7 +170,25 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         </div>
       </div>
       <Button type="submit" disabled={isLoading}>
-        {isLoading ? 'Generating...🧘‍♀️✨' : 'Generate Meditation'}
+        {isLoading ? (
+          <div className="flex items-center justify-center">            
+          <Oval
+              height={20}
+              width={20}
+              color="#ffffff"
+              wrapperStyle={{}}
+              wrapperClass=""
+              visible={true}
+              ariaLabel='oval-loading'
+              secondaryColor="#ffffff"
+              strokeWidth={4}
+              strokeWidthSecondary={4}
+            />
+            <span className="ml-2">Creating your meditation...just a few secs, for now: just breath and relax🧘‍♀️✨</span>
+          </div>
+        ) : (
+          'Generate Meditation'
+        )}
       </Button>
       {errorMessage && <p>{errorMessage}</p>}
     </form>
