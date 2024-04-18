@@ -53,6 +53,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
   const [audioUrl, setAudioUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [playingVoiceSample, setPlayingVoiceSample] = useState<HTMLAudioElement | null>(null);
 
   const handleToggleChange = (name: string, value: string) => {
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
@@ -84,6 +85,27 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
       setErrorMessage('Failed to generate meditation. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePlayVoiceSample = async (voiceId: string, ttsProvider: string) => {
+    try {
+      const response = await fetch(`/api/voice-samples?voiceId=${voiceId}&ttsProvider=${ttsProvider}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      if (playingVoiceSample) {
+        playingVoiceSample.pause();
+      }
+
+      const audio = new Audio(audioUrl);
+      audio.play();
+      setPlayingVoiceSample(audio);
+    } catch (error) {
+      console.error('There was a problem retrieving the voice sample:', error);
     }
   };
 
@@ -157,15 +179,23 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         <Label htmlFor="voice">🗣️ Voice Selection</Label>
         <div className="grid grid-cols-3 gap-4">
           {voiceOptions[formData.ttsProvider].map(option => (
-            <Toggle
-              key={option.value}
-              size="sm"
-              variant="outline"
-              pressed={formData.voice === option.value}
-              onPressedChange={() => handleToggleChange('voice', option.value)}
-            >
-              {option.label}
-            </Toggle>
+            <div key={option.value} className="flex items-center">
+              <Toggle
+                size="sm"
+                variant="outline"
+                pressed={formData.voice === option.value}
+                onPressedChange={() => handleToggleChange('voice', option.value)}
+              >
+                {option.label}
+              </Toggle>
+              <button
+                type="button"
+                onClick={() => handlePlayVoiceSample(option.label, formData.ttsProvider)}
+                className="ml-2 text-sm text-gray-500 hover:text-gray-700"
+              >
+                🔊
+              </button>
+            </div>
           ))}
         </div>
       </div>

@@ -163,7 +163,7 @@ export async function POST(req: Request) {
           voice: voice,
           text: segment,
           model_id: "eleven_monolingual_v1",
-          output_format: "mp3",
+          output_format: "mp3_44100_128",
         });
         await fs.promises.writeFile(audioFilePath, audio);
       } else {
