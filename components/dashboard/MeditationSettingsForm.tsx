@@ -35,6 +35,7 @@ interface MeditationSettings {
   guidanceLevel: string;
   ttsProvider: string;
   voice: string;
+  meditationFocus: string;
 }
 
 interface MeditationSettingsFormProps {
@@ -48,6 +49,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
     guidanceLevel: 'low',
     ttsProvider: 'openai',
     voice: 'alloy',
+    meditationFocus: 'mindfulness and breath control',
   });
   const [audioUrl, setAudioUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -143,6 +145,20 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         </div>
       </div>
       <div className="flex items-center gap-4">
+        <Label htmlFor="meditation-focus">💆‍♂️ Meditation Focus</Label>
+        <select
+          id="meditation-focus"
+          value={formData.meditationFocus}
+          onChange={(e) => setFormData(prevFormData => ({ ...prevFormData, meditationFocus: e.target.value }))}
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="mindfulness and breath control">Mindfulness and Breath Control</option>
+          <option value="loving-kindness and compassion">Loving-kindness and Compassion</option>
+          <option value="body scan and relaxation">Body Scan and Relaxation</option>
+          <option value="visualization and inner journey">Visualization and Inner Journey</option>
+        </select>
+      </div>
+      <div className="flex items-center gap-4">
         <Label htmlFor="guidance-level">🧘‍♀️ Guidance Amount</Label>
         <div className="grid grid-cols-3 gap-4">
           {guidanceOptions.map(option => (
@@ -209,7 +225,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
               wrapperClass=""
               visible={true}
               ariaLabel='oval-loading'
-              secondaryColor="#ffffff"
+              secondaryColor="#cccccc"
               strokeWidth={4}
               strokeWidthSecondary={4}
             />
