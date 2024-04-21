@@ -1,18 +1,20 @@
-import { Metadata } from "next"
-import Link from "next/link"
-
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { Icons } from "@/components/shared/icons"
-import { UserAuthForm } from "@/components/forms/user-auth-form"
-import { Suspense } from "react"
-import DoraLogo from "@/components/ui/dora-logo"
+import { Metadata } from "next";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { Icons } from "@/components/shared/icons";
+import { UserAuthForm } from "@/components/forms/user-auth-form";
+import { Suspense } from "react";
+import DoraLogo from "@/components/ui/dora-logo";
+import { Button } from "@/components/ui/button";
+import { SignInModal } from "@/components/layout/sign-in-modal";
+import { SignInButton } from "./sign-in-button";
 
 
 export const metadata: Metadata = {
   title: "Login",
   description: "Login to your account",
-}
+};
 
 export default function LoginPage() {
   return (
@@ -34,25 +36,20 @@ export default function LoginPage() {
           <div className="mx-auto mb-6">
             <DoraLogo />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back!
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Sign up!</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your email to sign in to your account
+            Enter your email to get started
           </p>
         </div>
         <Suspense>
           <UserAuthForm />
         </Suspense>
         <p className="px-8 text-center text-sm text-muted-foreground">
-          <Link
-            href="/register"
-            className="hover:text-brand underline underline-offset-4"
-          >
-            Don&apos;t have an account? Sign Up
-          </Link>
+         <SignInButton />
+
         </p>
       </div>
+      <SignInModal />
     </div>
-  )
+  );
 }

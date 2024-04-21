@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Icons } from "@/components/shared/icons";
 import { Modal } from "@/components/shared/modal";
@@ -12,6 +12,18 @@ import { signIn } from "next-auth/react";
 export const SignInModal = () => {
   const signInModal = useSigninModal();
   const [signInClicked, setSignInClicked] = useState(false);
+
+  useEffect(() => {
+    const handleOpenSignInModal = () => {
+      signInModal.onOpen();
+    };
+
+    document.addEventListener("openSignInModal", handleOpenSignInModal);
+
+    return () => {
+      document.removeEventListener("openSignInModal", handleOpenSignInModal);
+    };
+  }, [signInModal]);
 
   return (
     <Modal showModal={signInModal.isOpen} setShowModal={signInModal.onClose}>
