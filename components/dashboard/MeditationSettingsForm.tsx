@@ -1,6 +1,6 @@
 // app/components/dashboard/MeditationSettingsForm.tsx
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Toggle } from "@/components/ui/toggle";
@@ -55,6 +55,45 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [playingVoiceSample, setPlayingVoiceSample] = useState<HTMLAudioElement | null>(null);
+  const [voiceSampleUrls, setVoiceSampleUrls] = useState<Record<string, { voiceId: string; url: string }[]>>({
+    openai: [],
+    elevenlabs: [],
+  });
+  const [preloadedAudio, setPreloadedAudio] = useState<Record<string, HTMLAudioElement>>({});
+
+  useEffect(() => {
+    const fetchVoiceSampleUrls = async () => {
+      try {
+        const response = await fetch('/api/voice-samples-urls');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setVoiceSampleUrls(data);
+      } catch (error) {
+        console.error('Error fetching voice sample URLs:', error);
+      }
+    };
+
+    fetchVoiceSampleUrls();
+  }, []);
+
+  useEffect(() => {
+    const preloadAudio = async () => {
+      const audioElements: Record<string, HTMLAudioElement> = {};
+
+      for (const provider in voiceSampleUrls) {
+        for (const sample of voiceSampleUrls[provider]) {
+          const audio = new Audio(sample.url);
+          audioElements[`${provider}-${sample.voiceId}`] = audio;
+        }
+      }
+
+      setPreloadedAudio(audioElements);
+    };
+
+    preloadAudio();
+  }, [voiceSampleUrls]);
 
   const handleToggleChange = (name: string, value: string) => {
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
@@ -89,24 +128,17 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
     }
   };
 
-  const handlePlayVoiceSample = async (voiceId: string, ttsProvider: string) => {
-    try {
-      const response = await fetch(`/api/voice-samples?voiceId=${voiceId}&ttsProvider=${ttsProvider}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
+  const handlePlayVoiceSample = (voiceId: string, ttsProvider: string) => {
+    const audioKey = `${ttsProvider}-${voiceId}`;
+    const audio = preloadedAudio[audioKey];
 
+    if (audio) {
       if (playingVoiceSample) {
         playingVoiceSample.pause();
       }
 
-      const audio = new Audio(audioUrl);
       audio.play();
       setPlayingVoiceSample(audio);
-    } catch (error) {
-      console.error('There was a problem retrieving the voice sample:', error);
     }
   };
 
