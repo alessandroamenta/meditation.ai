@@ -45,11 +45,11 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
     setIsLoading(true);
 
     if (!showCodeInput) {
-      const password = randomString(12); // Generate a random password
-
-      const { error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signInWithOtp({
         email: data.email.toLowerCase(),
-        password,
+        options: {
+          emailRedirectTo: searchParams?.get("from") || "/dashboard",
+        },
       });
 
       setIsLoading(false);
@@ -73,7 +73,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
       const { error } = await supabase.auth.verifyOtp({
         email,
         token: data.code ?? "",
-        type: "signup",
+        type: "magiclink",
       });
 
       setIsLoading(false);
@@ -87,13 +87,13 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
       }
 
       return toast({
-        title: "Signed up successfully",
-        description: "You are now signed up.",
+        title: "Signed in successfully",
+        description: "You are now signed in.",
         variant: "default",
       });
     }
   }
-  
+
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={handleSubmit(onSubmit)}>
