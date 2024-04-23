@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -40,6 +40,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
   const [email, setEmail] = React.useState<string>("");
 
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   async function onSubmit(data: FormData) {
     setIsLoading(true);
@@ -48,7 +49,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
       const { error } = await supabase.auth.signInWithOtp({
         email: data.email.toLowerCase(),
         options: {
-          emailRedirectTo: searchParams?.get("from") || "/dashboard",
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
 
@@ -70,14 +71,14 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
         description: "We sent you a verification code. Please enter it below.",
       });
     } else {
-      const { error } = await supabase.auth.verifyOtp({
+      const { data: { user }, error } = await supabase.auth.verifyOtp({
         email,
         token: data.code ?? "",
         type: "magiclink",
       });
-
+  
       setIsLoading(false);
-
+  
       if (error) {
         return toast({
           title: "Something went wrong.",
@@ -85,15 +86,50 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
           variant: "destructive",
         });
       }
-
-      return toast({
-        title: "Signed in successfully",
-        description: "You are now signed in.",
-        variant: "default",
-      });
+  
+      if (user) {
+        try {
+          const { error: signUpError } = await supabase
+            .from('"next_auth"."users"')
+            .upsert({ email: user.email });
+  
+          if (signUpError) {
+            return toast({
+              title: "Something went wrong.",
+              description: signUpError.message,
+              variant: "destructive",
+            });
+          }
+  
+          await signIn('credentials', {
+            redirect: false,
+            email: user.email,
+          });
+  
+          router.push("/dashboard");
+        } catch (signInError) {
+          if (signInError.message === 'No user found with the provided credentials.') {
+            return toast({
+              title: "User not found",
+              description: "The provided email is not registered.",
+              variant: "destructive",
+            });
+          }
+          return toast({
+            title: "Something went wrong.",
+            description: signInError.message,
+            variant: "destructive",
+          });
+        }
+      } else {
+        return toast({
+          title: "Invalid verification code",
+          description: "The provided verification code is invalid or has expired.",
+          variant: "destructive",
+        });
+      }
     }
   }
-
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={handleSubmit(onSubmit)}>
