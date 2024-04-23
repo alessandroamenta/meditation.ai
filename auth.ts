@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getUserByEmail } from "@/lib/user";
 import MagicLinkEmail from "@/emails/magic-link-email";
 import { siteConfig } from "@/config/site";
+import crypto from "crypto";
 
 export const {
   handlers: { GET, POST },
@@ -28,7 +29,10 @@ export const {
     Nodemailer({
       server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM,
-      async sendVerificationRequest({ identifier, url, provider }) {
+      async generateVerificationToken() {
+        return crypto.randomBytes(32).toString("hex");
+      },
+      async sendVerificationRequest({ identifier, url, provider, token }) {
         const user = await getUserByEmail(identifier);
         if (!user || !user.name) return;
 
@@ -46,7 +50,7 @@ export const {
             subject: authSubject,
             html: MagicLinkEmail({
               firstName: user?.name as string,
-              actionUrl: url,
+              actionUrl: `${url}?token=${token}`,
               mailType: userVerified ? "login" : "register",
               siteName: siteConfig.name,
             }),
