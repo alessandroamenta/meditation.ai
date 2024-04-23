@@ -1,17 +1,20 @@
 import NextAuth from "next-auth";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
 import Google from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
+import Nodemailer from "next-auth/providers/nodemailer";
 import { env } from "@/env.mjs";
 import { createClient } from "@supabase/supabase-js";
+import { getUserByEmail } from "@/lib/user";
+import MagicLinkEmail from "@/emails/magic-link-email";
+import { siteConfig } from "@/config/site";
 
-export const { 
+export const {
   handlers: { GET, POST },
   auth,
 } = NextAuth({
   adapter: SupabaseAdapter({
-    url: env.NEXT_PUBLIC_SUPABASE_URL || '',
-    secret: env.SUPABASE_SERVICE_ROLE_KEY || '',
+    url: env.NEXT_PUBLIC_SUPABASE_URL || "",
+    secret: env.SUPABASE_SERVICE_ROLE_KEY || "",
   }),
   session: { strategy: "jwt" },
   pages: {
@@ -22,35 +25,35 @@ export const {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
-    CredentialsProvider({
-      name: 'Magic Link',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-      },
-      async authorize(credentials) {
-        const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL || '', env.SUPABASE_SERVICE_ROLE_KEY || '');
-    
-        if (credentials?.email) {
-          const { data, error } = await supabase
-            .from('"next_auth"."users"')
-            .select('*')
-            .eq('email', credentials.email)
-            .single();
-      
-          if (error) {
-            if (error.code === 'PGRST116') {
-              // User not found, return null
-              return null;
-            }
-            throw new Error(error.message);
-          }
-      
-          if (data) {
-            return data;
-          }
+    Nodemailer({
+      server: process.env.EMAIL_SERVER,
+      from: process.env.EMAIL_FROM,
+      async sendVerificationRequest({ identifier, url, provider }) {
+        const user = await getUserByEmail(identifier);
+        if (!user || !user.name) return;
+
+        const userVerified = user?.emailVerified ? true : false;
+        const authSubject = userVerified
+          ? `Sign-in link for ${siteConfig.name}`
+          : "Activate your account";
+
+        try {
+          const { host } = new URL(url);
+          const transport = provider.server.createTransport();
+          await transport.sendMail({
+            to: identifier,
+            from: provider.from,
+            subject: authSubject,
+            html: MagicLinkEmail({
+              firstName: user?.name as string,
+              actionUrl: url,
+              mailType: userVerified ? "login" : "register",
+              siteName: siteConfig.name,
+            }),
+          });
+        } catch (error) {
+          throw new Error("Failed to send verification email.");
         }
-      
-        return null;
       },
     }),
   ],
