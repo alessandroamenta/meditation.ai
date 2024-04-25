@@ -31,21 +31,49 @@ export const {
       },
       async authorize(credentials) {
         const { email } = credentials as { email: string };
-        const { data, error } = await supabase
-          .schema("next_auth")  
+        console.log('Received credentials:', { email });
+      
+        // First, check if the user exists
+        const { data: existingUser, error: findUserError } = await supabase
+          .schema("next_auth")
           .from("users")
           .select("*")
           .eq("email", email)
           .single();
-
-        if (error || !data) {
-          console.error("Error finding user:", error);
+      
+        if (findUserError) {
+          console.error("Error finding user:", findUserError.message, findUserError.code);
           throw new Error("An error occurred. Please try again later.");
         }
-
-        return data;
-      },
-    }),
+      
+        console.log("Existing user data:", existingUser);
+      
+        // If the user exists, return the user data
+        if (existingUser) {
+          return existingUser;
+        }
+      
+        console.log("Creating new user with email:", email);
+      
+        // If the user doesn't exist, create a new user record
+        const { data: newUser, error: createUserError } = await supabase
+          .schema("next_auth")
+          .from("users")
+          .insert({ email })
+          .select("*")
+          .single();
+      
+        if (createUserError) {
+          console.error("Error creating user:", createUserError.message, createUserError.code);
+          throw new Error("An error occurred while creating a new user.");
+        }
+      
+        console.log("New user created successfully:", newUser);
+      
+        // Return the newly created user data
+        return newUser;
+      }
+  }),
   ],
   callbacks: {
     async session({ token, session }) {
