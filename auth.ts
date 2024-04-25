@@ -1,13 +1,11 @@
 import NextAuth from "next-auth";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
 import Google from "next-auth/providers/google";
-import Nodemailer from "next-auth/providers/nodemailer";
 import { env } from "@/env.mjs";
 import { createClient } from "@supabase/supabase-js";
-import { getUserByEmail } from "@/lib/user";
-import MagicLinkEmail from "@/emails/magic-link-email";
-import { siteConfig } from "@/config/site";
-import crypto from "crypto";
+import CredentialsProvider from "next-auth/providers/credentials";
+
+const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL || "", env.SUPABASE_SERVICE_ROLE_KEY || "");
 
 export const {
   handlers: { GET, POST },
@@ -26,44 +24,32 @@ export const {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
-    Nodemailer({
-      server: process.env.EMAIL_SERVER,
-      from: process.env.EMAIL_FROM,
-      async generateVerificationToken() {
-        return crypto.randomBytes(32).toString("hex");
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
       },
-      async sendVerificationRequest({ identifier, url, provider, token }) {
-        const user = await getUserByEmail(identifier);
-        if (!user || !user.name) return;
+      async authorize(credentials) {
+        const { email } = credentials as { email: string };
+        const { data, error } = await supabase
+          .schema("next_auth")  
+          .from("users")
+          .select("*")
+          .eq("email", email)
+          .single();
 
-        const userVerified = user?.emailVerified ? true : false;
-        const authSubject = userVerified
-          ? `Sign-in link for ${siteConfig.name}`
-          : "Activate your account";
-
-        try {
-          const { host } = new URL(url);
-          const transport = provider.server.createTransport();
-          await transport.sendMail({
-            to: identifier,
-            from: provider.from,
-            subject: authSubject,
-            html: MagicLinkEmail({
-              firstName: user?.name as string,
-              actionUrl: `${url}?token=${token}`,
-              mailType: userVerified ? "login" : "register",
-              siteName: siteConfig.name,
-            }),
-          });
-        } catch (error) {
-          throw new Error("Failed to send verification email.");
+        if (error || !data) {
+          console.error("Error finding user:", error);
+          throw new Error("An error occurred. Please try again later.");
         }
+
+        return data;
       },
     }),
   ],
   callbacks: {
     async session({ token, session }) {
-      if (session.user) {
+      if (session?.user) {
         if (token.sub) {
           session.user.id = token.sub;
         }
@@ -82,7 +68,6 @@ export const {
         token.email = user.email;
         token.picture = user.image;
       }
-
       console.log("this is the token", token);
       return token;
     },

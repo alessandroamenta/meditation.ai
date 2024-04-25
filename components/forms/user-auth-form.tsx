@@ -14,10 +14,9 @@ import { toast } from "@/components/ui/use-toast";
 import { Icons } from "@/components/shared/icons";
 import { createClient } from "@supabase/supabase-js";
 import { randomString } from '@/lib/utils';
+import { env } from "@/env.mjs";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl ?? "", supabaseKey ?? "");
+
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   type?: string;
@@ -42,94 +41,98 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || ""
+  );
   async function onSubmit(data: FormData) {
     setIsLoading(true);
 
     if (!showCodeInput) {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: data.email.toLowerCase(),
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-
-      setIsLoading(false);
-
-      if (error) {
-        return toast({
-          title: "Something went wrong.",
-          description: error.message,
-          variant: "destructive",
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: data.email.toLowerCase(),
+          options: {
+            shouldCreateUser: true,
+          },
         });
-      }
 
-      setEmail(data.email.toLowerCase());
-      setShowCodeInput(true);
+        setIsLoading(false);
 
-      return toast({
-        title: "Check your email",
-        description: "We sent you a verification code. Please enter it below.",
-      });
-    } else {
-      const { data: { user }, error } = await supabase.auth.verifyOtp({
-        email,
-        token: data.code ?? "",
-        type: "magiclink",
-      });
-  
-      setIsLoading(false);
-  
-      if (error) {
-        return toast({
-          title: "Something went wrong.",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-  
-      if (user) {
-        try {
-          const { error: signUpError } = await supabase
-            .from('"next_auth"."users"')
-            .upsert({ email: user.email });
-  
-          if (signUpError) {
-            return toast({
-              title: "Something went wrong.",
-              description: signUpError.message,
-              variant: "destructive",
-            });
-          }
-  
-          await signIn('credentials', {
-            redirect: false,
-            email: user.email,
-          });
-  
-          router.push("/dashboard");
-        } catch (signInError) {
-          if (signInError.message === 'No user found with the provided credentials.') {
-            return toast({
-              title: "User not found",
-              description: "The provided email is not registered.",
-              variant: "destructive",
-            });
-          }
+        if (error) {
           return toast({
             title: "Something went wrong.",
-            description: signInError.message,
+            description: error.message,
             variant: "destructive",
           });
         }
-      } else {
+
+        setEmail(data.email.toLowerCase());
+        setShowCodeInput(true);
+
         return toast({
-          title: "Invalid verification code",
-          description: "The provided verification code is invalid or has expired.",
+          title: "Check your email",
+          description: "We sent you a magic link. Please click on it to sign in.",
+        });
+      } catch (error) {
+        setIsLoading(false);
+        return toast({
+          title: "Something went wrong.",
+          description: "An error occurred while sending the magic link.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      try {
+        console.log("Verifying OTP:", email, data.code);
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.verifyOtp({
+          email,
+          token: data.code ?? "",
+          type: "email",
+        });
+      
+        setIsLoading(false);
+      
+        if (error) {
+          return toast({
+            title: "Something went wrong.",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      
+        // Sign in the user using the `signIn` function
+        const result = await signIn("credentials", {
+          redirect: false,
+          email,
+          callbackUrl: "/dashboard",
+        });
+        console.log("Sign-in result:", result);
+      
+        if (result?.error) {
+          return toast({
+            title: "Something went wrong.",
+            description: result.error,
+            variant: "destructive",
+          });
+        }
+      
+        // Redirect to the dashboard after successful login
+        router.push("/dashboard");
+      } catch (error) {
+        setIsLoading(false);
+        return toast({
+          title: "Something went wrong.",
+          description: "An error occurred while verifying the magic link.",
           variant: "destructive",
         });
       }
     }
   }
+
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={handleSubmit(onSubmit)}>
