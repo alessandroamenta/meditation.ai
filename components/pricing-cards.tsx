@@ -31,11 +31,11 @@ export function PricingCards({ userId, subscriptionPlan }: PricingCardsProps) {
       <div className="mx-auto mb-10 flex w-full flex-col gap-5">
         <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Pricing</p>
         <h2 className="font-heading text-3xl leading-[1.1] md:text-5xl">
-          Start at full speed !
+          Start your meditation journey !
         </h2>
       </div>
 
-      <div className="mb-4 flex items-center gap-5">
+     {/* <div className="mb-4 flex items-center gap-5">
         <span>Monthly Billing</span>
         <Switch
           checked={isYearly}
@@ -44,9 +44,9 @@ export function PricingCards({ userId, subscriptionPlan }: PricingCardsProps) {
           aria-label="switch-year"
         />
         <span>Annual Billing</span>
-      </div>
+      </div> */}
 
-      <div className="mx-auto grid max-w-screen-lg gap-5 bg-inherit py-5 md:grid-cols-3 lg:grid-cols-3">
+      <div className="mx-auto grid max-w-screen-lg gap-5 bg-inherit py-5 md:grid-cols-2 lg:grid-cols-2">
         {pricingData.map((offer) => (
           <div className="relative flex flex-col overflow-hidden rounded-xl border" key={offer.title}>
             <div className="min-h-[150px] items-start space-y-4 bg-secondary/70 p-6">
@@ -57,19 +57,15 @@ export function PricingCards({ userId, subscriptionPlan }: PricingCardsProps) {
               <div className="flex flex-row">
                 <div className="flex items-end">
                   <div className="flex text-left text-3xl font-semibold leading-6">
-                    {isYearly && offer.prices.monthly > 0 ? (
-                      <>
-                        <span className="mr-2 text-muted-foreground line-through">${offer.prices.monthly}</span>
-                        <span>${offer.prices.yearly / 12}</span>
-                      </>
-                    ) : `$${offer.prices.monthly}`}
+                    <span>${offer.prices.monthly}</span>
                   </div>
                   <div className="-mb-1 ml-2 text-left text-sm font-medium">
                     <div>/mo</div>
                   </div>
                 </div>
               </div>
-              {offer.prices.monthly > 0 ? (
+
+              {offer.prices.monthly > 10 ? (
                 <div className="text-left text-sm text-muted-foreground">
                   {isYearly ? `$${offer.prices.yearly} will be charged when annual` : "when charged monthly"}
                 </div>
@@ -117,8 +113,8 @@ export function PricingCards({ userId, subscriptionPlan }: PricingCardsProps) {
       </div>
 
       <p className="mt-3 text-balance text-center text-base text-muted-foreground">
-        Email <a className="font-medium text-primary hover:underline" href="mailto:support@saas-starter.com">support@saas-starter.com</a> for to contact our support team.
-        <br />
+        {/*Email <a className="font-medium text-primary hover:underline" href="mailto:support@saas-starter.com">support@saas-starter.com</a> for to contact our support team.
+        <br />*/}
         <strong>You can test the subscriptions and won&apos;t be charged.</strong>
       </p>
     </section>
