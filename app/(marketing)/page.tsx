@@ -16,8 +16,8 @@ export default async function IndexPage() {
         <div className="container flex max-w-[64rem] flex-col items-center gap-5 text-center">
           <Link
             href="/login"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "animate-fade-up opacity-0")}
-            style={{ animationDelay: "0.15s", animationFillMode: "forwards" }}
+            className={cn(buttonVariants({ variant: "outline", size: "xl" }), "animate-fade-up opacity-0")}
+            style={{ animationDelay: "0.15s", animationFillMode: "forwards", fontSize: "1.25rem" }}
           >
             Start now!
           </Link>
@@ -44,8 +44,8 @@ export default async function IndexPage() {
             style={{
               animationDelay: "0.4s",
               animationFillMode: "forwards",
-                backgroundColor: "white", // White background
-                borderRadius: "8px", // Optional: if you want rounded corners
+              backgroundColor: "rgba(255, 255, 255, 0.3)", // Semi-transparent white background
+              borderRadius: "8px", // Optional: if you want rounded corners
               display: "inline-block", // Ensures the div wraps tightly around the image
               padding: "10px" // Optional: adds some space between the image and the background edge
             }}
