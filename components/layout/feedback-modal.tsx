@@ -46,7 +46,7 @@ export const FeedbackModal = () => {
             🙌
           </a>
           <h3 className="font-urban text-2xl font-bold">Feedback</h3>
-          <p className="text-lg">Tell us why you use the app and what can we do to improve it?</p>
+          <p className="text-lg">Tell us why you use the app and what we can do to improve it.</p>
         </div>
   
         {!feedbackSubmitted ? (
@@ -54,7 +54,7 @@ export const FeedbackModal = () => {
             <textarea
               className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={4}
-              placeholder="Your feedback..."
+              placeholder="Your feedback...feel free to be brutally honest"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
             />
