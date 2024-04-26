@@ -50,7 +50,7 @@ export function DashboardNav({ items }: DashboardNavProps) {
       <div className="mt-auto">
         <Button
           onClick={() => useFeedbackModal.getState().onOpen()}
-          className="group fixed bottom-28 left-4 flex items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"
+          className="group fixed bottom-28 left-30 flex items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"
           style={{
             zIndex: 9999, // Ensure the button is on top of other elements
           }}

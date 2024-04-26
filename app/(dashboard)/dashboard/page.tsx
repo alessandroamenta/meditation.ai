@@ -18,9 +18,11 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
+  const userName = user?.name ? user.name.split(" ")[0] : "friend";
+
   return (
     <DashboardShell>
-      <DashboardHeader heading="Dashboard" text="Create any meditation with AI.">
+      <DashboardHeader heading={`Hi, ${userName}!`} text="Ready to get some headspace? Create any meditation with AI.">
         <Button>Fake button</Button>
       </DashboardHeader>
       <div>
