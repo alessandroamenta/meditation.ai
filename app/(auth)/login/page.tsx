@@ -37,9 +37,7 @@ export default function LoginPage() {
             <DoraLogo />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Sign up!</h1>
-          <p className="text-sm text-muted-foreground">
-            Enter your email to get started
-          </p>
+          <p className="text-sm text-muted-foreground">Enter your email to get started</p>
         </div>
         <Suspense>
           <UserAuthForm />
