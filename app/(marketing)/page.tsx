@@ -44,7 +44,7 @@ export default async function IndexPage() {
             style={{
               animationDelay: "0.4s",
               animationFillMode: "forwards",
-              backgroundColor: "rgba(255, 255, 255, 0.3)", // Semi-transparent white background
+              backgroundColor: "white", // Fully white background
               borderRadius: "8px", // Optional: if you want rounded corners
               display: "inline-block", // Ensures the div wraps tightly around the image
               padding: "10px" // Optional: adds some space between the image and the background edge
