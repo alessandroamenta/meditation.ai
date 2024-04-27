@@ -12,6 +12,7 @@ import { signIn } from "next-auth/react";
 export const SignInModal = () => {
   const signInModal = useSigninModal();
   const [signInClicked, setSignInClicked] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
 
   useEffect(() => {
     const handleOpenSignInModal = () => {
@@ -33,29 +34,50 @@ export const SignInModal = () => {
             🧘‍♀️
           </a>
           <h3 className="font-urban text-2xl font-bold">Sign In</h3>
-
         </div>
 
         <div className="flex flex-col space-y-4 bg-secondary/50 px-4 py-8 md:px-16">
           <Button
             variant="default"
-            disabled={signInClicked}
+            disabled={signInClicked && selectedProvider !== "google"}
             onClick={() => {
               setSignInClicked(true);
-              signIn("google", { redirect: true, callbackUrl: "/dashboard" }) // Redirect to /dashboard after sign-in
-                .then(() =>                // TODO: fix this without setTimeOut(), modal closes too quickly. Idea: update value before redirect
-                setTimeout(() => {
-                  signInModal.onClose();
-                }, 1000)
-              );
+              setSelectedProvider("google");
+              signIn("google", { redirect: true, callbackUrl: "/dashboard" })
+                .then(() =>
+                  setTimeout(() => {
+                    signInModal.onClose();
+                  }, 1000)
+                );
             }}
           >
-            {signInClicked ? (
+            {signInClicked && selectedProvider === "google" ? (
               <Icons.spinner className="mr-2 size-4 animate-spin" />
             ) : (
               <Icons.google className="mr-2 size-4" />
             )}{" "}
             Sign In with Google
+          </Button>
+          <Button
+            variant="default"
+            disabled={signInClicked && selectedProvider !== "twitter"}
+            onClick={() => {
+              setSignInClicked(true);
+              setSelectedProvider("twitter");
+              signIn("twitter", { redirect: true, callbackUrl: "/dashboard" })
+                .then(() =>
+                  setTimeout(() => {
+                    signInModal.onClose();
+                  }, 1000)
+                );
+            }}
+          >
+            {signInClicked && selectedProvider === "twitter" ? (
+              <Icons.spinner className="mr-2 size-4 animate-spin" />
+            ) : (
+              <Icons.twitter className="mr-2 size-4" />
+            )}{" "}
+            Sign In with Twitter
           </Button>
         </div>
       </div>

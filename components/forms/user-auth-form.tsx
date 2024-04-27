@@ -35,6 +35,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
+  const [isTwitterLoading, setIsTwitterLoading] = React.useState<boolean>(false); // New state variable
   const [showCodeInput, setShowCodeInput] = React.useState<boolean>(false);
   const [email, setEmail] = React.useState<string>("");
 
@@ -135,7 +136,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      {/*<form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="email">
@@ -186,14 +187,14 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
             {showCodeInput ? "Verify Code" : "Sign In with Email"}
           </button>
         </div>
-      </form>
+      </form>*/}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
+            Continue with
           </span>
         </div>
       </div>
@@ -212,6 +213,23 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
           <Icons.google className="mr-2 size-4" />
         )}{" "}
         Google
+      </button>
+
+      <button
+        type="button"
+        className={cn(buttonVariants({ variant: "outline" }))}
+        onClick={() => {
+          setIsTwitterLoading(true); // Use the new state variable
+          signIn("twitter");
+        }}
+        disabled={isLoading || isTwitterLoading} // Use the new state variable
+      >
+        {isTwitterLoading ? ( // Use the new state variable
+          <Icons.spinner className="mr-2 size-4 animate-spin" />
+        ) : (
+          <Icons.twitter className="mr-2 size-4" />
+        )}{" "}
+        Twitter
       </button>
     </div>
   );
