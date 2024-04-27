@@ -4,21 +4,21 @@ import { pricingData } from "@/config/subscriptions";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { UserSubscriptionPlan } from "types";
+import { supabase } from "@/lib/supabase";
 
 export async function getUserSubscriptionPlan(
   userId: string
 ): Promise<UserSubscriptionPlan> {
-  const user = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-    select: {
-      stripeSubscriptionId: true,
-      stripeCurrentPeriodEnd: true,
-      stripeCustomerId: true,
-      stripePriceId: true,
-    },
-  })
+  const { data: user, error } = await supabase
+    .schema("next_auth")
+    .from("users")
+    .select("stripeSubscriptionId, stripeCurrentPeriodEnd, stripeCustomerId, stripePriceId")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    throw new Error("User not found");
+  }
 
   if (!user) {
     throw new Error("User not found")

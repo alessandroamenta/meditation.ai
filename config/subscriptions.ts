@@ -3,7 +3,7 @@ import { env } from "@/env.mjs"
 
 export const pricingData: SubscriptionPlan[] = [
   {
-    title: 'Starter',
+    title: 'Free Trial',
     description: 'For Beginners',
     benefits: [
       'Up to 3 monthly generations',

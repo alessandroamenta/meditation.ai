@@ -20,8 +20,8 @@ export default async function SettingsPage() {
   return (
     <DashboardShell>
       <DashboardHeader
-        heading="Settings"
-        text="Manage account and website settings."
+        heading="Meditations"
+        text="Your Meditation Library"
       />
       <div className="grid gap-10">
         <UserNameForm user={{ id: user.id, name: user.name || "" }} />
