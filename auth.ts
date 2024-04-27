@@ -27,7 +27,16 @@ export const {
     }),
     Twitter({
       clientId: process.env.TWITTER_CLIENT_ID,
-      clientSecret: process.env.TWITTER_CLIENT_SECRET
+      clientSecret: process.env.TWITTER_CLIENT_SECRET,
+      //userinfo: "https://api.twitter.com/2/users/me?user.fields=profile_image_url,username",
+      profile(profile) {
+        return {
+          id: profile.data.id,
+          name: profile.data.name,
+          email: profile.data.username, // Assign username to email field
+          image: profile.data.profile_image_url,
+        };
+      },
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -81,19 +90,21 @@ export const {
   }),
   ],
   callbacks: {
-    async session({ token, session }) {
-      if (session?.user) {
-        if (token.sub) {
-          session.user.id = token.sub;
+      async session({ token, session }) {
+        if (session?.user) {
+          if (token.sub) {
+            session.user.id = token.sub;
+          }
+          if (token.provider === "twitter") {
+            session.user.username = token.email; // Assign username to session.user.username
+          } else if (token.email) {
+            session.user.email = token.email;
+          }
+          session.user.name = token.name;
+          session.user.image = token.picture;
         }
-        if (token.email) {
-          session.user.email = token.email;
-        }
-        session.user.name = token.name;
-        session.user.image = token.picture;
-      }
-      return session;
-    },
+        return session;
+      },
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
