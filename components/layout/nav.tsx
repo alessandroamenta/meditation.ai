@@ -56,7 +56,7 @@ export function DashboardNav({ items }: DashboardNavProps) {
           }}
         >
           <Icons.feedback className="mr-2 size-4" />
-          <span>Feedback</span>
+          <span>Feedback + ideas</span>
         </Button>
       </div>
 

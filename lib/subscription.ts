@@ -31,8 +31,15 @@ export async function getUserSubscriptionPlan(
     pricingData.find((plan) => plan.stripeIds.monthly === user.stripePriceId) ||
     pricingData.find((plan) => plan.stripeIds.yearly === user.stripePriceId);
 
-    const plan = isPaid && userPlan ? userPlan : pricingData[0]
-    console.log("Subscription plan:", plan);
+  // If the user is on a paid plan and the userPlan is found, return the userPlan
+  // Otherwise, return the "Free Trial" plan
+  const plan = isPaid && userPlan ? userPlan : pricingData.find((plan) => plan.title === "Free Trial");
 
-  return plan;
+  // Check if plan is defined before returning
+  if (plan) {
+    console.log("Subscription plan:", plan);
+    return plan;
+  } else {
+    throw new Error("No subscription plan found");
+  }
 }

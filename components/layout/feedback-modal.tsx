@@ -54,7 +54,7 @@ export const FeedbackModal = () => {
             <textarea
               className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={4}
-              placeholder="Leave your feedback...feel free to be brutally honest"
+              placeholder="Leave your thoughts here..."
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
             />

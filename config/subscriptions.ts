@@ -4,7 +4,7 @@ import { env } from "@/env.mjs"
 export const pricingData: SubscriptionPlan[] = [
   {
     title: 'Free Trial',
-    description: 'For Beginners',
+    description: 'For Trying it out',
     benefits: [
       'Up to 3 monthly generations',
       'Meditation library to replay saved sessions',
