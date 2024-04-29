@@ -11,6 +11,8 @@ export async function POST(request: Request) {
   }
 
   const userId = session.user.id;
+  console.log("User ID (create-checkout-session):", userId);
+
   const { priceId } = await request.json();
 
   try {
@@ -29,6 +31,8 @@ export async function POST(request: Request) {
         userId: userId,
       },
     });
+
+    console.log("Checkout Session Metadata:", checkoutSession.metadata);
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {

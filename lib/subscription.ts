@@ -24,7 +24,9 @@ export async function getUserSubscriptionPlan(
   // Check if user is on a paid plan.
   const isPaid =
     user.stripePriceId &&
-    user.stripeCurrentPeriodEnd?.getTime() + 86_400_000 > Date.now() ? true : false;
+    (user.stripeCurrentPeriodEnd instanceof Date
+      ? user.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now()
+      : false);
 
   // Find the pricing data corresponding to the user's plan
   const userPlan =

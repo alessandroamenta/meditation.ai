@@ -3,8 +3,6 @@ import Stripe from "stripe";
 import { env } from "@/env.mjs";
 import { stripe } from "@/lib/stripe";
 import { createClient } from "@supabase/supabase-js";
-import { auth } from "@/auth";
-import { NextResponse } from 'next/server';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -32,27 +30,23 @@ export async function POST(req: Request) {
 
   const session = event.data.object as Stripe.Checkout.Session;
 
-  // Check if the session is not null
-  if (!session) {
-    console.error("Invalid session");
-    return new Response("Invalid session", { status: 400 });
+  // Check if the session and session.metadata are not null
+  if (!session || !session.metadata) {
+    console.error("Invalid session or metadata");
+    return new Response("Invalid session or metadata", { status: 400 });
   }
 
-  const authSession = await auth();
-  if (!authSession || !authSession.user || !authSession.user.id) {
-    console.error("Not authorized");
-    return new NextResponse(JSON.stringify({ error: 'Not authorized' }), { status: 401 });
-  }
+  console.log("Session Metadata:", session.metadata);
 
-  console.log("authSession:", authSession);
-
-  const userId = authSession.user.id;
-  console.log("User ID:", userId);
+  const userId = session.metadata.userId;
+  console.log("User ID (webhook):", userId);
 
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
+
+    const proPlan = subscription.items.data[0].price.product === env.NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID;
 
     await supabase
       .schema("next_auth")
@@ -64,6 +58,7 @@ export async function POST(req: Request) {
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
+        subscriptionPlan: proPlan ? "Pro Plan" : "Free Trial",
       })
       .eq("id", userId);
   }
