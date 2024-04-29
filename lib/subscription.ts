@@ -1,14 +1,11 @@
-// @ts-nocheck
-// TODO: Fix this when we turn strict mode on.
 import { pricingData } from "@/config/subscriptions";
-import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
-import { UserSubscriptionPlan } from "types";
 import { supabase } from "@/lib/supabase";
+import { SubscriptionPlan } from "types";
 
 export async function getUserSubscriptionPlan(
   userId: string
-): Promise<UserSubscriptionPlan> {
+): Promise<SubscriptionPlan> {
   const { data: user, error } = await supabase
     .schema("next_auth")
     .from("users")
@@ -34,30 +31,8 @@ export async function getUserSubscriptionPlan(
     pricingData.find((plan) => plan.stripeIds.monthly === user.stripePriceId) ||
     pricingData.find((plan) => plan.stripeIds.yearly === user.stripePriceId);
 
-  const plan = isPaid && userPlan ? userPlan : pricingData[0]
+    const plan = isPaid && userPlan ? userPlan : pricingData[0]
+    console.log("Subscription plan:", plan);
 
-  const interval = isPaid
-    ? userPlan?.stripeIds.monthly === user.stripePriceId
-      ? "month"
-      : userPlan?.stripeIds.yearly === user.stripePriceId
-      ? "year"
-      : null
-    : null;
-
-  let isCanceled = false;
-  if (isPaid && user.stripeSubscriptionId) {
-    const stripePlan = await stripe.subscriptions.retrieve(
-      user.stripeSubscriptionId
-    )
-    isCanceled = stripePlan.cancel_at_period_end
-  }
-
-  return {
-    ...plan,
-    ...user,
-    stripeCurrentPeriodEnd: user.stripeCurrentPeriodEnd?.getTime(),
-    isPaid,
-    interval,
-    isCanceled
-  }
+  return plan;
 }

@@ -21,6 +21,7 @@ export default async function BillingPage() {
   }
 
   const subscriptionPlan = await getUserSubscriptionPlan(user.id)
+  console.log("Subscription plan in BillingPage:", subscriptionPlan);
 
   return (
     <DashboardShell>

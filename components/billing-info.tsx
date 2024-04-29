@@ -11,17 +11,57 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { cn, formatDate } from "@/lib/utils"
-import Link from "next/link"
-import { UserSubscriptionPlan } from "types"
+import { cn } from "@/lib/utils"
+import { pricingData } from "@/config/subscriptions"
+import { SubscriptionPlan } from "types"
 
 interface BillingInfoProps extends React.HTMLAttributes<HTMLFormElement> {
-  subscriptionPlan: UserSubscriptionPlan;
+  subscriptionPlan: SubscriptionPlan;
 }
 
 export function BillingInfo({
   subscriptionPlan
 }: BillingInfoProps) {
+  console.log("Subscription plan in BillingInfo:", subscriptionPlan);
+
+  const handleUpgrade = async () => {
+    const proPlan = pricingData.find((plan) => plan.title === "Pro");
+  
+    if (!proPlan || !proPlan.stripeIds.monthly) {
+      console.error("Stripe monthly price ID is missing for the Pro plan");
+      return;
+    }
+  
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          priceId: proPlan.stripeIds.monthly,
+        }),
+      });
+  
+      if (response.ok) {
+        const { url } = await response.json();
+        window.location.href = url;
+      } else {
+        console.error("Failed to create Checkout session");
+      }
+    } catch (error) {
+      console.error("Error creating Checkout session:", error);
+    }
+  };
+  
+
+  const handleManageSubscription = () => {
+    // Redirect to the Stripe customer portal for managing the subscription
+    window.location.href = "/billing";
+  };
+
+  const isFreeTrial = subscriptionPlan.title === "Free Trial";
+  const isProPlan = subscriptionPlan.title === "Pro";
 
   return (
     <Card>
@@ -34,20 +74,20 @@ export function BillingInfo({
       </CardHeader>
       <CardContent>{subscriptionPlan.description}</CardContent>
       <CardFooter className="flex flex-col items-start space-y-2 md:flex-row md:justify-between md:space-x-0">
-        <Link
-          href="/pricing"
-          className={cn(buttonVariants())}
-        >
-          {subscriptionPlan.isPaid ? "Manage Subscription" : "Upgrade now"}
-        </Link>
-
-        {subscriptionPlan.isPaid ? (
-          <p className="rounded-full text-xs font-medium">
-            {subscriptionPlan.isCanceled
-              ? "Your plan will be canceled on "
-              : "Your plan renews on "}
-            {formatDate(subscriptionPlan.stripeCurrentPeriodEnd)}.
-          </p>
+        {isFreeTrial ? (
+          <button
+            className={cn(buttonVariants())}
+            onClick={handleUpgrade}
+          >
+            Upgrade now
+          </button>
+        ) : isProPlan ? (
+          <button
+            className={cn(buttonVariants())}
+            onClick={handleManageSubscription}
+          >
+            Manage Subscription
+          </button>
         ) : null}
       </CardFooter>
     </Card>

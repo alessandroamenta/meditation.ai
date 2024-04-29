@@ -2,8 +2,8 @@ import { headers } from "next/headers"
 import Stripe from "stripe"
 
 import { env } from "@/env.mjs"
-import { prisma } from "@/lib/db"
 import { stripe } from "@/lib/stripe"
+import { supabase } from "@/lib/supabase"
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -24,47 +24,39 @@ export async function POST(req: Request) {
   const session = event.data.object as Stripe.Checkout.Session
 
   if (event.type === "checkout.session.completed") {
-    // Retrieve the subscription details from Stripe.
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     )
 
-    // Update the user stripe into in our database.
-    // Since this is the initial subscription, we need to update
-    // the subscription id and customer id.
-    await prisma.user.update({
-      where: {
-        id: session?.metadata?.userId,
-      },
-      data: {
+    await supabase
+      .schema("next_auth")
+      .from("users")
+      .update({
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
         stripePriceId: subscription.items.data[0].price.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
-      },
-    })
+      })
+      .eq("id", session?.metadata?.userId)
   }
 
   if (event.type === "invoice.payment_succeeded") {
-    // Retrieve the subscription details from Stripe.
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     )
 
-    // Update the price id and set the new period end.
-    await prisma.user.update({
-      where: {
-        stripeSubscriptionId: subscription.id,
-      },
-      data: {
+    await supabase
+      .schema("next_auth")
+      .from("users")
+      .update({
         stripePriceId: subscription.items.data[0].price.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
-      },
-    })
+      })
+      .eq("stripeSubscriptionId", subscription.id)
   }
 
   return new Response(null, { status: 200 })

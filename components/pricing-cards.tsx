@@ -104,7 +104,7 @@ export function PricingCards({ userId, subscriptionPlan }: PricingCardsProps) {
                   <BillingFormButton year={isYearly} offer={offer} subscriptionPlan={subscriptionPlan} />
                 )
               ) : (
-                <Button onClick={signInModal.onOpen}>Sign in</Button>
+                <Button onClick={signInModal.onOpen}>Sign up!</Button>
               )}
 
             </div>

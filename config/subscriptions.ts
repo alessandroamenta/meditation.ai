@@ -31,8 +31,7 @@ export const pricingData: SubscriptionPlan[] = [
       'Priority access to new features',
       'Customer support',
     ],
-    limitations: [
-    ],
+    limitations: [],
     prices: {
       monthly: 10,
       yearly: 0,
@@ -42,5 +41,4 @@ export const pricingData: SubscriptionPlan[] = [
       yearly: null,
     },
   },
-
 ];
