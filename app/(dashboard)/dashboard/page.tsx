@@ -6,6 +6,7 @@ import { DashboardHeader } from "@/components/dashboard/header"
 import { DashboardShell } from "@/components/dashboard/shell"
 import { Button } from "@/components/ui/button"
 import MeditationSection from "@/components/dashboard/MeditationSection"
+import { SubscriptionModal } from "@/components/layout/subscription-modal"
 
 export const metadata = {
   title: "Dashboard",
@@ -38,6 +39,7 @@ export default async function DashboardPage() {
         */}
         <MeditationSection />
       </div>
+      <SubscriptionModal />
     </DashboardShell>
   )
 }

@@ -17,20 +17,20 @@ export async function POST(request: Request) {
 
   try {
     const checkoutSession = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
+        mode: "subscription",
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
+        metadata: {
+          userId: userId,
         },
-      ],
-      success_url: `${env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
-      metadata: {
-        userId: userId,
-      },
-    });
+      });
 
     console.log("Checkout Session Metadata:", checkoutSession.metadata);
 

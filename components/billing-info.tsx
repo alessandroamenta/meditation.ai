@@ -9,12 +9,16 @@ import { cn } from "@/lib/utils"
 import { pricingData } from "@/config/subscriptions"
 import { SubscriptionPlan } from "types"
 import { Icons } from "@/components/shared/icons"
+import { getUserSubscriptionPlan } from "@/lib/subscription"
 
 interface BillingInfoProps extends React.HTMLAttributes<HTMLFormElement> {
+  userId: string;
   subscriptionPlan: SubscriptionPlan;
 }
 
-export function BillingInfo({ subscriptionPlan }: BillingInfoProps) {
+export async function BillingInfo({ userId }: BillingInfoProps) {
+  const subscriptionPlan = await getUserSubscriptionPlan(userId);
+
   const handleUpgrade = async () => {
     const proPlan = pricingData.find((plan) => plan.title === "Pro");
 
@@ -47,20 +51,25 @@ export function BillingInfo({ subscriptionPlan }: BillingInfoProps) {
 
   const handleManageSubscription = async () => {
     try {
-      const response = await fetch("/api/manage-subscription");
+      const response = await fetch("/api/create-portal-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (response.ok) {
         const { url } = await response.json();
         window.location.href = url;
       } else {
-        console.error("Failed to create customer portal session");
+        console.error("Failed to create Customer Portal session");
       }
     } catch (error) {
-      console.error("Error creating customer portal session:", error);
+      console.error("Error creating Customer Portal session:", error);
     }
   };
 
   const isFreeTrial = subscriptionPlan.title === "Free Trial";
-  const isProPlan = subscriptionPlan.title === "Pro";
+  const isProPlan = subscriptionPlan.title === "Pro Plan";
 
   return (
     <div className="mx-auto grid max-w-screen-lg gap-5 bg-inherit py-5 md:grid-cols-2 lg:grid-cols-2">

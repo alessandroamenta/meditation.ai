@@ -45,9 +45,9 @@ export async function POST(req: Request) {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
-
-    const proPlan = subscription.items.data[0].price.product === env.NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID;
-
+  
+    const proPlanPriceId = env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PLAN_ID;
+  
     await supabase
       .schema("next_auth")
       .from("users")
@@ -58,9 +58,24 @@ export async function POST(req: Request) {
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
-        subscriptionPlan: proPlan ? "Pro Plan" : "Free Trial",
+        subscriptionPlan: subscription.items.data[0].price.id === proPlanPriceId ? "Pro Plan" : "Free Trial",
       })
       .eq("id", userId);
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    const subscription = event.data.object as Stripe.Subscription;
+
+    await supabase
+      .schema("next_auth")
+      .from("users")
+      .update({
+        stripeSubscriptionId: null,
+        stripePriceId: null,
+        stripeCurrentPeriodEnd: null,
+        subscriptionPlan: "Free Trial",
+      })
+      .eq("stripeSubscriptionId", subscription.id);
   }
 
   return new Response(null, { status: 200 });

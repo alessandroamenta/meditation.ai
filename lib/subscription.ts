@@ -2,6 +2,7 @@ import { pricingData } from "@/config/subscriptions";
 import { stripe } from "@/lib/stripe";
 import { supabase } from "@/lib/supabase";
 import { SubscriptionPlan } from "types";
+import { env } from "@/env.mjs";
 
 export async function getUserSubscriptionPlan(
   userId: string
@@ -9,7 +10,7 @@ export async function getUserSubscriptionPlan(
   const { data: user, error } = await supabase
     .schema("next_auth")
     .from("users")
-    .select("stripeSubscriptionId, stripeCurrentPeriodEnd, stripeCustomerId, stripePriceId")
+    .select("stripeSubscriptionId, stripeCurrentPeriodEnd, stripeCustomerId, stripePriceId, subscriptionPlan")
     .eq("id", userId)
     .single();
 
@@ -28,20 +29,32 @@ export async function getUserSubscriptionPlan(
       ? user.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now()
       : false);
 
-  // Find the pricing data corresponding to the user's plan
-  const userPlan =
-    pricingData.find((plan) => plan.stripeIds.monthly === user.stripePriceId) ||
-    pricingData.find((plan) => plan.stripeIds.yearly === user.stripePriceId);
+  const plan = {
+    title: user.subscriptionPlan,
+    description: user.subscriptionPlan === "Pro Plan" ? "Unlock Advanced Features" : "For Trying it out",
+    benefits: user.subscriptionPlan === "Pro Plan" ? [
+      'Up to 30 monthly generations',
+      'Meditation library to replay saved sessions',
+      'Priority access to new features',
+      'Customer support',
+    ] : [
+      'Up to 3 monthly generations',
+      'Meditation library to replay saved sessions',
+    ],
+    limitations: user.subscriptionPlan === "Pro Plan" ? [] : [
+      'No priority access to new features.',
+      'Limited customer support',
+    ],
+    prices: {
+      monthly: user.subscriptionPlan === "Pro Plan" ? 10 : 0,
+      yearly: 0,
+    },
+    stripeIds: {
+      monthly: user.subscriptionPlan === "Pro Plan" ? env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PLAN_ID : null,
+      yearly: null,
+    },
+  };
 
-  // If the user is on a paid plan and the userPlan is found, return the userPlan
-  // Otherwise, return the "Free Trial" plan
-  const plan = isPaid && userPlan ? userPlan : pricingData.find((plan) => plan.title === "Free Trial");
-
-  // Check if plan is defined before returning
-  if (plan) {
-    console.log("Subscription plan:", plan);
-    return plan;
-  } else {
-    throw new Error("No subscription plan found");
-  }
+  console.log("Subscription plan:", plan);
+  return plan;
 }

@@ -14,13 +14,14 @@ export const metadata = {
 }
 
 export default async function BillingPage() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login")
+    redirect("/login");
   }
 
-  const subscriptionPlan = await getUserSubscriptionPlan(user.id)
+  const userId = user.id;
+  const subscriptionPlan = await getUserSubscriptionPlan(userId);
   console.log("Subscription plan in BillingPage:", subscriptionPlan);
 
   return (
@@ -47,10 +48,8 @@ export default async function BillingPage() {
             .
           </AlertDescription>
         </Alert>
-        <BillingInfo
-          subscriptionPlan={subscriptionPlan}
-        />
+        <BillingInfo userId={userId} subscriptionPlan={subscriptionPlan} />
       </div>
     </DashboardShell>
-  )
+  );
 }
