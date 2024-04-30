@@ -47,11 +47,13 @@ export async function POST(req: Request) {
     );
   
     const proPlanPriceId = env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PLAN_ID;
+    const credits = subscription.items.data[0].price.id === proPlanPriceId ? 30 : 3;
   
     await supabase
       .schema("next_auth")
       .from("users")
       .update({
+        credits: credits,
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
         stripePriceId: subscription.items.data[0].price.id,

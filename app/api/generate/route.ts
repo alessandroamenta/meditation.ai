@@ -113,8 +113,29 @@ export async function POST(req: Request) {
   8. The final section will gently conclude the session, guiding towards reawakening and reconnection with the surroundings. This closing section should include instructions for slowly opening the eyes, feeling the body, and becoming aware of the sounds and sensations in the environment, signaling the end of the meditation, while tying back to the main theme of the selected focus.
   Remember, the script's strict adherence to the ${charCount} character count, it should be ${sectionCount} sections total, and the strategic placement of ${pauseCount} '---PAUSE---' markers with gentle introductory phrases are essential for creating an impactful and seamless meditation experience. The use of ellipses and commas, especially at the beginning, will further enhance the slow and calming nature of the meditation.
 `;
+  
 
   try {
+    // Check user's available credits
+    const { data: userData, error: userError } = await supabase
+    .schema('next_auth')
+    .from('users')
+    .select('credits')
+    .eq('id', userId)
+    .single();
+
+    if (userError) {
+    console.error('Error fetching user credits:', userError);
+    return NextResponse.json({ error: 'Failed to fetch user credits. Please try again.' }, { status: 500 });
+    }
+
+    const availableCredits = userData.credits;
+    console.log('Available credits:', availableCredits);
+
+    if (availableCredits <= 0) {
+    return NextResponse.json({ error: 'You have reached your monthly meditation generation limit. Please upgrade your subscription or wait until next month.' }, { status: 403 });
+    }
+
     let meditationScript = '';
     
     if (aiProvider === 'openai') {
@@ -261,6 +282,17 @@ export async function POST(req: Request) {
             } else {
               console.log('Meditation inserted into table successfully');
               const meditationId = meditationData[0].id; // Get the generated meditation ID
+              // Decrement user's credits by 1
+              const { data: updateData, error: updateError } = await supabase
+                .schema('next_auth')
+                .from('users')
+                .update({ credits: availableCredits - 1 })
+                .eq('id', userId);
+
+              if (updateError) {
+                console.error('Error updating user credits:', updateError);
+                // You may want to handle this error differently, depending on your requirements
+              }
               resolve(NextResponse.json({ message: 'Meditation generated and stored successfully.', meditationId }));
             }
           } else {

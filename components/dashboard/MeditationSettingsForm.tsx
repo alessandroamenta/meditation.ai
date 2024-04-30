@@ -122,7 +122,11 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
       onMeditationGenerated(meditationId);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
-      setErrorMessage('Failed to generate meditation. Please try again.');
+      if (error.message.includes('reached your monthly meditation generation limit')) {
+        setErrorMessage('You have reached your monthly meditation generation limit. Please upgrade your subscription or wait until next month.');
+      } else {
+        setErrorMessage('Failed to generate meditation. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

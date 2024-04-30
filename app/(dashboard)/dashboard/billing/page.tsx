@@ -33,19 +33,9 @@ export default async function BillingPage() {
       <div className="grid gap-8">
         <Alert className="!pl-14">
           <Icons.warning />
-          <AlertTitle>This is a demo app.</AlertTitle>
+          <AlertTitle>This app is in beta.</AlertTitle>
           <AlertDescription>
-            SaaS Starter app is a demo app using a Stripe test environment. You can
-            find a list of test card numbers on the{" "}
-            <a
-              href="https://stripe.com/docs/testing#cards"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-8"
-            >
-              Stripe docs
-            </a>
-            .
+          Please be patient, if there are any bugs 🐞, let us know and we will fix them as soon as possible! 👨‍💻
           </AlertDescription>
         </Alert>
         <BillingInfo userId={userId} subscriptionPlan={subscriptionPlan} />
