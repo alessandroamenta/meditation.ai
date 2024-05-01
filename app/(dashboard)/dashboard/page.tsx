@@ -27,7 +27,7 @@ export default async function DashboardPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading={`Hi, ${userName}!`} text="Ready to get some headspace? Create any meditation with AI.">
-        <Button>Fake button</Button>
+        {/*<Button>Fake button</Button>*/}
       </DashboardHeader>
       <div>
         {/* 

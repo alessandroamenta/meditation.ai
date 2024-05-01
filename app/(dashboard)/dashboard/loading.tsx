@@ -7,7 +7,7 @@ export default function DashboardLoading() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Hi!" text="Ready to get some headspace? Create any meditation with AI.">
-        <Button>Fake button</Button>
+        {/*<Button>Fake button</Button>*/}
       </DashboardHeader>
       <div className="divide-border-200 divide-y rounded-md border">
         <CardSkeleton />
