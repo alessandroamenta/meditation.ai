@@ -21,9 +21,10 @@ interface DashboardNavProps {
 export function DashboardNav({ items }: DashboardNavProps) {
   const path = usePathname();
   const [credits, setCredits] = useState(0);
+  const [subscriptionPlan, setSubscriptionPlan] = useState('');
 
   useEffect(() => {
-    const fetchCredits = async () => {
+    const fetchUserData = async () => {
       try {
         const response = await fetch("/api/get-user-credits");
         if (!response.ok) {
@@ -31,16 +32,17 @@ export function DashboardNav({ items }: DashboardNavProps) {
         }
         const data = await response.json();
         setCredits(data.credits);
+        setSubscriptionPlan(data.subscriptionPlan);
       } catch (error) {
-        console.error("Error fetching user credits:", error);
+        console.error("Error fetching user data:", error);
       }
     };
 
     const handleCreditsUpdated = () => {
-      fetchCredits();
+      fetchUserData();
     };
 
-    fetchCredits();
+    fetchUserData();
 
     window.addEventListener(CREDITS_UPDATED_EVENT, handleCreditsUpdated);
 
@@ -80,16 +82,24 @@ export function DashboardNav({ items }: DashboardNavProps) {
       <div className="mt-4">
         <Link href="/dashboard/billing">
           <Button
-            className="group flex items-center rounded-md bg-indigo-600 px-4 py-3 text-base font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+            className={cn(
+              "group flex items-center rounded-md px-4 py-3 text-base font-medium text-white",
+              credits === 0 && subscriptionPlan === "Free Trial"
+                ? "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                : "bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+            )}
           >
             <Icons.topup className="mr-2 size-4 text-white" />
-            <span className="whitespace-nowrap">
-              You have <span className="font-bold">{credits}</span> credits
-            </span>
+            {credits === 0 && subscriptionPlan === "Free Trial" ? (
+              <span className="whitespace-nowrap"> <span className="font-bold">0</span> credits left. Upgrade!</span>
+            ) : (
+              <span className="whitespace-nowrap">
+                You have <span className="font-bold">{credits}</span> credits
+              </span>
+            )}
           </Button>
         </Link>
       </div>
-
 
       <div className="mt-auto">
         <Button

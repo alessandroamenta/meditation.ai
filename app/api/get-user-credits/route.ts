@@ -19,18 +19,18 @@ export async function GET(req: Request) {
     const { data: userData, error } = await supabase
       .schema('next_auth')
       .from('users')
-      .select('credits')
+      .select('credits, subscriptionPlan')
       .eq('id', userId)
       .single();
 
     if (error) {
-      console.error('Error fetching user credits:', error);
-      return NextResponse.json({ error: 'Failed to fetch user credits' }, { status: 500 });
+      console.error('Error fetching user data:', error);
+      return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 });
     }
 
-    return NextResponse.json({ credits: userData.credits });
+    return NextResponse.json({ credits: userData.credits, subscriptionPlan: userData.subscriptionPlan });
   } catch (error) {
-    console.error('Error fetching user credits:', error);
-    return NextResponse.json({ error: 'Failed to fetch user credits' }, { status: 500 });
+    console.error('Error fetching user data:', error);
+    return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 });
   }
 }

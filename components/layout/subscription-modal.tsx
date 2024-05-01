@@ -9,20 +9,35 @@ export const SubscriptionModal = () => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<"upgrade" | "downgrade" | null>(null);
+  const [previousSubscriptionStatus, setPreviousSubscriptionStatus] = useState<"active" | "trialing" | "inactive">("inactive");
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const sessionId = searchParams.get("session_id");
     const cancellation = searchParams.get("cancellation");
 
-    if (sessionId) {
-      setModalType("upgrade");
-      setShowModal(true);
-    } else if (cancellation) {
-      setModalType("downgrade");
-      setShowModal(true);
-    }
-  }, []);
+    const checkSubscriptionStatus = async () => {
+      try {
+        const response = await fetch("/api/subscription-status");
+        const data = await response.json();
+        const currentSubscriptionStatus = data.subscriptionStatus;
+
+        if (sessionId && (currentSubscriptionStatus === "active" || currentSubscriptionStatus === "trialing")) {
+          setModalType("upgrade");
+          setShowModal(true);
+        } else if (cancellation && currentSubscriptionStatus === "inactive") {
+          setModalType("downgrade");
+          setShowModal(true);
+        }
+
+        setPreviousSubscriptionStatus(currentSubscriptionStatus);
+      } catch (error) {
+        console.error("Error fetching subscription status:", error);
+      }
+    };
+
+    checkSubscriptionStatus();
+  }, [previousSubscriptionStatus]);
 
   const closeModal = () => {
     setShowModal(false);
