@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Toggle } from "@/components/ui/toggle";
 import { Oval } from 'react-loader-spinner';
+import { OutOfCreditsModal } from "@/components/layout/outofcredits-modal";
+import { dispatchCreditsUpdatedEvent } from "@/lib/events";
 
 const aiProviderOptions = ['openai', 'anthropic'];
 const durationOptions = ['2-5min', '5-10min', '10+min'];
@@ -60,6 +62,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
     elevenlabs: [],
   });
   const [preloadedAudio, setPreloadedAudio] = useState<Record<string, HTMLAudioElement>>({});
+  const [isOutOfCredits, setIsOutOfCredits] = useState(false);
 
   useEffect(() => {
     const fetchVoiceSampleUrls = async () => {
@@ -113,24 +116,28 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
         body: JSON.stringify(formData),
       });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        if (errorData.error === 'You have reached your monthly meditation generation limit. Please upgrade your subscription or wait until next month.') {
+          setIsOutOfCredits(true);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        const result = await response.json();
+        console.log('Received API response:', result);
+        dispatchCreditsUpdatedEvent();
+        const meditationId = result.meditationId;
+        setAudioUrl(audioUrl);
+        onMeditationGenerated(meditationId);
       }
-      const result = await response.json();
-      console.log('Received API response:', result);
-      const meditationId = result.meditationId;
-      setAudioUrl(audioUrl);
-      onMeditationGenerated(meditationId);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
-      if (error.message.includes('reached your monthly meditation generation limit')) {
-        setErrorMessage('You have reached your monthly meditation generation limit. Please upgrade your subscription or wait until next month.');
-      } else {
-        setErrorMessage('Failed to generate meditation. Please try again.');
-      }
+      setErrorMessage('Failed to generate meditation. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handlePlayVoiceSample = (voiceId: string, ttsProvider: string) => {
     const audioKey = `${ttsProvider}-${voiceId}`;
@@ -147,6 +154,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
   };
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="grid gap-4 p-6 rounded-lg border border-gray-200 dark:border-gray-800">
       <div className="flex items-center gap-4">
        <Label htmlFor="ai-provider">🤖 AI Model</Label>
@@ -273,6 +281,9 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({ onMedit
       </Button>
       {errorMessage && <p>{errorMessage}</p>}
     </form>
+        <OutOfCreditsModal isOpen={isOutOfCredits} onClose={() => setIsOutOfCredits(false)} />
+        </>
+
   );
 };
 

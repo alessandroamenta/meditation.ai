@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { env } from "@/env.mjs";
 import { stripe } from "@/lib/stripe";
 import { createClient } from "@supabase/supabase-js";
+import { dispatchCreditsUpdatedEvent } from "@/lib/events";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -63,6 +64,7 @@ export async function POST(req: Request) {
         subscriptionPlan: subscription.items.data[0].price.id === proPlanPriceId ? "Pro Plan" : "Free Trial",
       })
       .eq("id", userId);
+      dispatchCreditsUpdatedEvent();
   }
 
   if (event.type === "customer.subscription.deleted") {

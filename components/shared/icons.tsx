@@ -25,7 +25,8 @@ import {
   LucideIcon,
   Sparkles,
   Send,
-  MessageSquareMore
+  MessageSquareMore,
+  SquarePlus,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -85,6 +86,7 @@ export const Icons = {
   trash: Trash,
   send: Send,
   feedback: MessageSquareMore,
+  topup: SquarePlus,
   twitter: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"

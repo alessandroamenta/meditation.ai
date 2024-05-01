@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,7 +11,8 @@ import { Icons } from "@/components/shared/icons";
 import { useFeedbackModal } from "@/hooks/use-feedback-modal";
 import { FeedbackModal } from "./feedback-modal";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { CREDITS_UPDATED_EVENT } from "@/lib/events";
 
 interface DashboardNavProps {
   items: SidebarNavItem[];
@@ -18,6 +20,34 @@ interface DashboardNavProps {
 
 export function DashboardNav({ items }: DashboardNavProps) {
   const path = usePathname();
+  const [credits, setCredits] = useState(0);
+
+  useEffect(() => {
+    const fetchCredits = async () => {
+      try {
+        const response = await fetch("/api/get-user-credits");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setCredits(data.credits);
+      } catch (error) {
+        console.error("Error fetching user credits:", error);
+      }
+    };
+
+    const handleCreditsUpdated = () => {
+      fetchCredits();
+    };
+
+    fetchCredits();
+
+    window.addEventListener(CREDITS_UPDATED_EVENT, handleCreditsUpdated);
+
+    return () => {
+      window.removeEventListener(CREDITS_UPDATED_EVENT, handleCreditsUpdated);
+    };
+  }, []);
 
   if (!items?.length) {
     return null;
@@ -47,12 +77,26 @@ export function DashboardNav({ items }: DashboardNavProps) {
         })}
       </nav>
 
+      <div className="mt-4">
+        <Link href="/dashboard/billing">
+          <Button
+            className="group flex items-center rounded-md bg-indigo-600 px-4 py-3 text-base font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+          >
+            <Icons.topup className="mr-2 size-4 text-white" />
+            <span className="whitespace-nowrap">
+              You have <span className="font-bold">{credits}</span> credits
+            </span>
+          </Button>
+        </Link>
+      </div>
+
+
       <div className="mt-auto">
         <Button
           onClick={() => useFeedbackModal.getState().onOpen()}
-          className="group fixed bottom-28 left-30 flex items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"
+          className="group fixed bottom-28 left-30 flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
           style={{
-            zIndex: 9999, // Ensure the button is on top of other elements
+            zIndex: 9999,
           }}
         >
           <Icons.feedback className="mr-2 size-4" />
