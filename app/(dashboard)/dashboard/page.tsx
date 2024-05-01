@@ -21,6 +21,9 @@ export default async function DashboardPage() {
 
   const userName = user?.name ? user.name.split(" ")[0] : "friend";
 
+  // Call the cron job API to schedule the credit reset job
+  await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/cron`, { method: "POST" });
+
   return (
     <DashboardShell>
       <DashboardHeader heading={`Hi, ${userName}!`} text="Ready to get some headspace? Create any meditation with AI.">

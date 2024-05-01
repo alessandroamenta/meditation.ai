@@ -3,7 +3,7 @@
 import { generateUserStripe } from '@/actions/generate-user-stripe'
 import { Icons } from "@/components/shared/icons"
 import { Button } from "@/components/ui/button"
-import { SubscriptionPlan, UserSubscriptionPlan } from "@/types"
+import { SubscriptionPlan, UserSubscriptionPlan } from "types"
 import { useTransition } from 'react'
 
 interface BillingFormButtonProps {
