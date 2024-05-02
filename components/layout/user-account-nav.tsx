@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Sparkles, CreditCard, LayoutDashboard, LogOut, Settings } from "lucide-react"
+import { Sparkles, CreditCard, LayoutDashboard, LogOut, Settings, Home } from "lucide-react"
 import type { User } from "next-auth"
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -42,7 +42,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="flex items-center space-x-2.5">
-            <LayoutDashboard className="size-4" />
+            <Home className="size-4" />
             <p className="text-sm">Dashboard</p>
           </Link>
         </DropdownMenuItem>
@@ -56,12 +56,6 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           <Link href="/dashboard/billing" className="flex items-center space-x-2.5">
             <CreditCard className="size-4" />
             <p className="text-sm">Billing</p>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings" className="flex items-center space-x-2.5">
-            <Settings className="size-4" />
-            <p className="text-sm">Settings</p>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
