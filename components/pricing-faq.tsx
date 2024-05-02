@@ -9,27 +9,17 @@ const pricingFaqData = [
   {
     id: "item-1",
     question: "What is the cost of the free plan?",
-    answer: "Our free plan is completely free, with no monthly or annual charges. It's a great way to get started and explore our basic features.",
+    answer: "Our free plan is completely free, with no charges whatsoever. It's a fantastic way to get started and try out our basic features.",
   },
   {
     id: "item-2",
-    question: "How much does the Basic Monthly plan cost?",
-    answer: "The Basic Monthly plan is priced at $15 per month. It provides access to our core features and is billed on a monthly basis.",
+    question: "How much does the Pro Monthly plan cost?",
+    answer: "The Pro plan is priced at $10 per month. It provides 30 credits, each credit can be used to generate one meditation, and is billed on a monthly basis.",
   },
   {
     id: "item-3",
-    question: "What is the price of the Pro Monthly plan?",
-    answer: "The Pro Monthly plan is available for $25 per month. It offers advanced features and is billed on a monthly basis for added flexibility.",
-  },
-  {
-    id: "item-4",
     question: "Do you offer any annual subscription plans?",
-    answer: "Yes, we offer annual subscription plans for even more savings. The Basic Annual plan is $144 per year, and the Pro Annual plan is $300 per year.",
-  },
-  {
-    id: "item-5",
-    question: "Is there a trial period for the paid plans?",
-    answer: "We offer a 14-day free trial for both the Pro Monthly and Pro Annual plans. It's a great way to experience all the features before committing to a paid subscription.",
+    answer: "Not yet, but we are planning to introduce an annual subscription plan soon. Stay tuned for updates!",
   },
 ];
 
@@ -41,8 +31,8 @@ export function PricingFaq() {
           Frequently Asked Questions
         </h1>
         <p className="text-md text-balance text-muted-foreground">
-          Explore our comprehensive FAQ to find quick answers to common inquiries.
-          If you need further assistance, don&apos;t hesitate to contact us for personalized help.
+          Explore our FAQs to find quick answers to common questions.
+          If you need further assistance, don&apos;t hesitate to contact us!
         </p>
       </div>
       <Accordion type="single" collapsible className="w-full">
