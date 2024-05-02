@@ -32,10 +32,10 @@ export const metadata = {
   ],
   authors: [
     {
-      name: "mickasmt",
+      name: "ale_amenta",
     },
   ],
-  creator: "mickasmt",
+  creator: "ale_amenta",
   metadataBase: new URL(siteConfig.url),
   openGraph: {
     type: "website",

@@ -55,6 +55,7 @@ export default async function IndexPage() {
               alt="Meditation Girl Illustration"
               width={300}
               height={300}
+              priority
             />
           </div>
 
