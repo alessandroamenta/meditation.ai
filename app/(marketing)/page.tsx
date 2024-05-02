@@ -27,7 +27,7 @@ export default async function IndexPage() {
             style={{ animationDelay: "0.25s", animationFillMode: "forwards" }}
           >
             Unlock your inner peace with{" "}
-            <span className="text-gradient_indigo-purple font-extrabold">
+            <span className="bg-gradient-to-r from-teal-500 to-purple-500 bg-clip-text text-transparent font-extrabold">
              Dora.AI
             </span>
           </h1>
