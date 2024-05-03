@@ -1,28 +1,21 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import { NextResponse } from 'next/server';
 import OpenAI from "openai";
-import axios from 'axios';
 import Anthropic from '@anthropic-ai/sdk';
 import { ElevenLabsClient, play } from "elevenlabs";
-import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import { auth } from "@/auth";
 import os from 'os';
 
-// Setting the ffmpeg and ffprobe paths
-ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH || '');
-ffmpeg.setFfprobePath(process.env.FFPROBE_PATH || '');
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
-
-console.log('Using ffmpeg at:', process.env.FFMPEG_PATH);
-console.log('Using ffprobe at:', process.env.FFPROBE_PATH);
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

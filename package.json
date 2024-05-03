@@ -25,6 +25,7 @@
     "@anthropic-ai/sdk": "^0.20.1",
     "@auth/prisma-adapter": "^2.0.0",
     "@auth/supabase-adapter": "^0.6.0",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@hookform/resolvers": "^3.3.4",
     "@prisma/client": "^5.13.0",
     "@radix-ui/react-accessible-icon": "^1.0.3",
