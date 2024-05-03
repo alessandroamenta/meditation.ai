@@ -1,12 +1,12 @@
 // app/(dashboard)/dashboard/MeditationSection.tsx
-'use client';
-import React, { useState } from 'react';
-import MeditationSettingsForm from "@/components/dashboard/MeditationSettingsForm"
-import MeditationPlayer from "@/components/dashboard/MeditationPlayer"
+"use client";
+import React, { useState } from "react";
+import MeditationSettingsForm from "@/components/dashboard/MeditationSettingsForm";
+import MeditationPlayer from "@/components/dashboard/MeditationPlayer";
 
 const MeditationSection: React.FC = () => {
-  const [meditationId, setMeditationId] = useState('');
-  const [audioUrl, setAudioUrl] = useState('');
+  const [meditationId, setMeditationId] = useState("");
+  const [audioUrl, setAudioUrl] = useState("");
   const [hasNewAudio, setHasNewAudio] = useState(false);
 
   const handleMeditationGenerated = async (meditationId: string) => {
@@ -23,15 +23,19 @@ const MeditationSection: React.FC = () => {
   };
 
   const handleDiscardMeditation = async () => {
-    await fetch(`/api/supabase?meditationId=${meditationId}`, { method: 'DELETE' });
+    await fetch(`/api/supabase?meditationId=${meditationId}`, {
+      method: "DELETE",
+    });
     setHasNewAudio(false);
   };
 
   return (
     <>
-      <MeditationSettingsForm onMeditationGenerated={handleMeditationGenerated} />
+      <MeditationSettingsForm
+        onMeditationGenerated={handleMeditationGenerated}
+      />
       {hasNewAudio && (
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg p-4 max-w-md mx-auto h-auto">
+        <div className="fixed bottom-0 left-1/2 mx-auto h-auto max-w-md -translate-x-1/2 transform rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900">
           <MeditationPlayer
             audioUrl={audioUrl}
             onSave={handleSaveMeditation}

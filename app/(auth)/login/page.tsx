@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { SignInModal } from "@/components/layout/sign-in-modal";
 import { SignInButton } from "./sign-in-button";
 
-
 export const metadata: Metadata = {
   title: "Login",
   description: "Login to your account",
@@ -23,7 +22,7 @@ export default function LoginPage() {
         href="/"
         className={cn(
           buttonVariants({ variant: "outline", size: "sm" }),
-          "absolute left-4 top-4 md:left-8 md:top-8"
+          "absolute left-4 top-4 md:left-8 md:top-8",
         )}
       >
         <>
@@ -37,14 +36,15 @@ export default function LoginPage() {
             <DoraLogo />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Sign up!</h1>
-          <p className="text-sm text-muted-foreground">Use your Google or X account to get started</p>
+          <p className="text-sm text-muted-foreground">
+            Use your Google or X account to get started
+          </p>
         </div>
         <Suspense>
           <UserAuthForm />
         </Suspense>
         <p className="px-8 text-center text-sm text-muted-foreground">
-         <SignInButton />
-
+          <SignInButton />
         </p>
       </div>
       <SignInModal />

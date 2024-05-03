@@ -8,8 +8,12 @@ import { Button } from "@/components/ui/button";
 export const SubscriptionModal = () => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState<"upgrade" | "downgrade" | null>(null);
-  const [previousSubscriptionStatus, setPreviousSubscriptionStatus] = useState<"active" | "trialing" | "inactive">("inactive");
+  const [modalType, setModalType] = useState<"upgrade" | "downgrade" | null>(
+    null,
+  );
+  const [previousSubscriptionStatus, setPreviousSubscriptionStatus] = useState<
+    "active" | "trialing" | "inactive"
+  >("inactive");
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -22,7 +26,11 @@ export const SubscriptionModal = () => {
         const data = await response.json();
         const currentSubscriptionStatus = data.subscriptionStatus;
 
-        if (sessionId && (currentSubscriptionStatus === "active" || currentSubscriptionStatus === "trialing")) {
+        if (
+          sessionId &&
+          (currentSubscriptionStatus === "active" ||
+            currentSubscriptionStatus === "trialing")
+        ) {
           setModalType("upgrade");
           setShowModal(true);
         } else if (cancellation && currentSubscriptionStatus === "inactive") {
@@ -54,8 +62,7 @@ export const SubscriptionModal = () => {
           <p className="text-lg">
             {modalType === "upgrade"
               ? "Yay! 🎉 Thanks a ton for upgrading to the Pro Plan! 🙌 As a solo maker your support means everything to me. I hope you enjoy the extra credits! If you need anything, just hit that feedback button. Thanks again! 😊"
-              : "Aw, sorry to see you go. 😢 But hey, I'm still super grateful you gave the app a shot! 🙏 Keep using the free version as long as you like, and if there's anything I can do to improve your experience, just hit that feedback button. Cheers! 😊"
-            }
+              : "Aw, sorry to see you go. 😢 But hey, I'm still super grateful you gave the app a shot! 🙏 Keep using the free version as long as you like, and if there's anything I can do to improve your experience, just hit that feedback button. Cheers! 😊"}
           </p>
         </div>
         <div className="flex justify-end bg-secondary/50 px-4 py-4 md:px-16">

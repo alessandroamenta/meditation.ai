@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
 import { useTransition } from "react";
-import { zodResolver } from "@hookform/resolvers/zod"
-import { User } from "@prisma/client"
-import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { User } from "@prisma/client";
+import { useForm } from "react-hook-form";
 
-import { cn } from "@/lib/utils"
-import { userNameSchema } from "@/lib/validations/user"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { userNameSchema } from "@/lib/validations/user";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,16 +15,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
-import { Icons } from "@/components/shared/icons"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
+import { Icons } from "@/components/shared/icons";
 
-import { updateUserName, type FormData } from "@/actions/update-user-name"
+import { updateUserName, type FormData } from "@/actions/update-user-name";
 
 interface UserNameFormProps {
-  user: Pick<User, "id" | "name">
+  user: Pick<User, "id" | "name">;
 }
 
 export function UserNameForm({ user }: UserNameFormProps) {
@@ -40,9 +40,9 @@ export function UserNameForm({ user }: UserNameFormProps) {
     defaultValues: {
       name: user?.name || "",
     },
-  })
+  });
 
-  const onSubmit = handleSubmit(data => {
+  const onSubmit = handleSubmit((data) => {
     startTransition(async () => {
       const { status } = await updateUserNameWithId(data);
 
@@ -51,14 +51,13 @@ export function UserNameForm({ user }: UserNameFormProps) {
           title: "Something went wrong.",
           description: "Your name was not updated. Please try again.",
           variant: "destructive",
-        })
+        });
       } else {
         toast({
           description: "Your name has been updated.",
-        })
+        });
       }
     });
-
   });
 
   return (
@@ -101,5 +100,5 @@ export function UserNameForm({ user }: UserNameFormProps) {
         </CardFooter>
       </Card>
     </form>
-  )
+  );
 }

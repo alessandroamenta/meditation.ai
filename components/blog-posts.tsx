@@ -1,6 +1,6 @@
-import { formatDate } from '@/lib/utils';
-import Image from 'next/image';
-import Link from 'next/link';
+import { formatDate } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
 
 export function BlogPosts({ posts }) {
   return (
@@ -39,7 +39,10 @@ export function BlogPosts({ posts }) {
         <h2 className="mb-4 font-heading text-3xl">Blog Posts</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {posts.slice(1).map((post) => (
-            <article key={post._id} className="group relative flex flex-col space-y-2">
+            <article
+              key={post._id}
+              className="group relative flex flex-col space-y-2"
+            >
               {post.image && (
                 <Image
                   alt={post.title}
@@ -49,9 +52,13 @@ export function BlogPosts({ posts }) {
                   className="rounded-md border bg-muted transition-colors"
                 />
               )}
-              <h2 className="line-clamp-1 font-heading text-2xl">{post.title}</h2>
+              <h2 className="line-clamp-1 font-heading text-2xl">
+                {post.title}
+              </h2>
               {post.description && (
-                <p className="line-clamp-1 text-muted-foreground">{post.description}</p>
+                <p className="line-clamp-1 text-muted-foreground">
+                  {post.description}
+                </p>
               )}
               {post.date && (
                 <p className="text-sm text-muted-foreground">
@@ -68,4 +75,3 @@ export function BlogPosts({ posts }) {
     </div>
   );
 }
-

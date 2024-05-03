@@ -4,10 +4,7 @@ import useMediaQuery from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Drawer } from "vaul";
 
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ModalProps {
   children: React.ReactNode;
@@ -16,13 +13,21 @@ interface ModalProps {
   setShowModal: () => void;
 }
 
-export function Modal({children, className, showModal, setShowModal}: ModalProps) {
+export function Modal({
+  children,
+  className,
+  showModal,
+  setShowModal,
+}: ModalProps) {
   const { isMobile } = useMediaQuery();
 
   if (isMobile) {
     return (
       <Drawer.Root open={showModal} onClose={setShowModal}>
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm" onClick={setShowModal} />
+        <Drawer.Overlay
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+          onClick={setShowModal}
+        />
         <Drawer.Portal>
           <Drawer.Content
             className={cn(
@@ -46,6 +51,5 @@ export function Modal({children, className, showModal, setShowModal}: ModalProps
         {children}
       </DialogContent>
     </Dialog>
-
   );
 }

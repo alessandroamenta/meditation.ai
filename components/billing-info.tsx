@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
+import * as React from "react";
+import Link from "next/link";
 
-import { buttonVariants } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import { pricingData } from "@/config/subscriptions"
-import { SubscriptionPlan } from "types"
-import { Icons } from "@/components/shared/icons"
-import { getUserSubscriptionPlan } from "@/lib/subscription"
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { pricingData } from "@/config/subscriptions";
+import { SubscriptionPlan } from "types";
+import { Icons } from "@/components/shared/icons";
+import { getUserSubscriptionPlan } from "@/lib/subscription";
 
 interface BillingInfoProps extends React.HTMLAttributes<HTMLFormElement> {
   userId: string;
@@ -74,7 +74,10 @@ export async function BillingInfo({ userId }: BillingInfoProps) {
   return (
     <div className="mx-auto grid max-w-screen-lg gap-5 bg-inherit py-5 md:grid-cols-2 lg:grid-cols-2">
       {pricingData.map((offer) => (
-        <Card key={offer.title} className="relative flex flex-col overflow-hidden rounded-xl border">
+        <Card
+          key={offer.title}
+          className="relative flex flex-col overflow-hidden rounded-xl border"
+        >
           <div className="min-h-[150px] items-start space-y-4 bg-secondary/70 p-6">
             <p className="flex font-urban text-sm font-bold uppercase tracking-wider text-muted-foreground">
               {offer.title}
@@ -103,7 +106,10 @@ export async function BillingInfo({ userId }: BillingInfoProps) {
 
               {offer.limitations.length > 0 &&
                 offer.limitations.map((feature) => (
-                  <li className="flex items-start text-muted-foreground" key={feature}>
+                  <li
+                    className="flex items-start text-muted-foreground"
+                    key={feature}
+                  >
                     <Icons.close className="mr-3 size-5 shrink-0" />
                     <p>{feature}</p>
                   </li>
@@ -112,15 +118,25 @@ export async function BillingInfo({ userId }: BillingInfoProps) {
 
             <CardFooter className="flex flex-col items-start space-y-2 md:flex-row md:justify-between md:space-x-0">
               {isFreeTrial && offer.title === "Free Trial" ? (
-                <span className={cn(buttonVariants({ variant: "default" }))}>Current plan</span>
+                <span className={cn(buttonVariants({ variant: "default" }))}>
+                  Current plan
+                </span>
               ) : isProPlan && offer.title === "Free Trial" ? (
-                <span className={cn(buttonVariants({ variant: "default" }))}>Basic plan</span>
+                <span className={cn(buttonVariants({ variant: "default" }))}>
+                  Basic plan
+                </span>
               ) : isProPlan && offer.title === "Pro" ? (
-                <button className={cn(buttonVariants())} onClick={handleManageSubscription}>
+                <button
+                  className={cn(buttonVariants())}
+                  onClick={handleManageSubscription}
+                >
                   Manage Subscription
                 </button>
               ) : isFreeTrial && offer.title === "Pro" ? (
-                <button className={cn(buttonVariants())} onClick={handleUpgrade}>
+                <button
+                  className={cn(buttonVariants())}
+                  onClick={handleUpgrade}
+                >
                   Upgrade now
                 </button>
               ) : (

@@ -15,14 +15,14 @@ export const FeedbackModal = () => {
 
   const handleSubmitFeedback = async () => {
     try {
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
+      const response = await fetch("/api/feedback", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ feedback }),
       });
-  
+
       if (response.ok) {
         setFeedbackSubmitted(true);
         setTimeout(() => {
@@ -30,25 +30,29 @@ export const FeedbackModal = () => {
         }, 1000);
       } else {
         const error = await response.json();
-        console.error('Failed to submit feedback:', error);
+        console.error("Failed to submit feedback:", error);
       }
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      console.error("Error submitting feedback:", error);
     }
   };
-  
 
   return (
-    <Modal showModal={feedbackModal.isOpen} setShowModal={feedbackModal.onClose}>
+    <Modal
+      showModal={feedbackModal.isOpen}
+      setShowModal={feedbackModal.onClose}
+    >
       <div className="w-full">
         <div className="flex flex-col items-center justify-center space-y-3 border-b bg-background px-4 py-6 pt-8 text-center md:px-16">
           <a href={siteConfig.url} className="text-6xl">
             🙌
           </a>
           <h3 className="font-urban text-2xl font-bold">Feedback</h3>
-          <p className="text-lg">Tell us why you use the app and what we can do to improve it.</p>
+          <p className="text-lg">
+            Tell us why you use the app and what we can do to improve it.
+          </p>
         </div>
-  
+
         {!feedbackSubmitted ? (
           <div className="flex flex-col space-y-4 bg-secondary/50 px-4 py-8 md:px-16">
             <textarea
@@ -58,7 +62,7 @@ export const FeedbackModal = () => {
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
             />
-  
+
             <Button
               variant="default"
               disabled={feedback.trim() === ""}
@@ -79,5 +83,5 @@ export const FeedbackModal = () => {
         )}
       </div>
     </Modal>
-  )
-}
+  );
+};

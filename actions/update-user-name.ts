@@ -11,7 +11,7 @@ export type FormData = {
 
 export async function updateUserName(userId: string, data: FormData) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user || session?.user.id !== userId) {
       throw new Error("Unauthorized");
@@ -27,12 +27,12 @@ export async function updateUserName(userId: string, data: FormData) {
       data: {
         name: name,
       },
-    })
+    });
 
-    revalidatePath('/dashboard/settings');
+    revalidatePath("/dashboard/settings");
     return { status: "success" };
   } catch (error) {
     // console.log(error)
-    return { status: "error" }
+    return { status: "error" };
   }
 }

@@ -1,25 +1,31 @@
-"use client"
+"use client";
 
-import { signOut } from "next-auth/react"
-import Link from "next/link"
+import { signOut } from "next-auth/react";
+import Link from "next/link";
 
-import { UserAvatar } from "@/components/shared/user-avatar"
+import { UserAvatar } from "@/components/shared/user-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { Sparkles, CreditCard, LayoutDashboard, LogOut, Settings, Home } from "lucide-react"
-import type { User } from "next-auth"
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sparkles,
+  CreditCard,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Home,
+} from "lucide-react";
+import type { User } from "next-auth";
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
-  user: Pick<User, "name" | "image" | "email">
+  user: Pick<User, "name" | "image" | "email">;
 }
 
 export function UserAccountNav({ user }: UserAccountNavProps) {
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -47,13 +53,19 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/meditations" className="flex items-center space-x-2.5">
+          <Link
+            href="/dashboard/meditations"
+            className="flex items-center space-x-2.5"
+          >
             <Sparkles className="size-4" />
             <p className="text-sm">Meditations</p>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/billing" className="flex items-center space-x-2.5">
+          <Link
+            href="/dashboard/billing"
+            className="flex items-center space-x-2.5"
+          >
             <CreditCard className="size-4" />
             <p className="text-sm">Billing</p>
           </Link>
@@ -62,10 +74,10 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         <DropdownMenuItem
           className="cursor-pointer"
           onSelect={(event) => {
-            event.preventDefault()
+            event.preventDefault();
             signOut({
               callbackUrl: `${window.location.origin}/`,
-            })
+            });
           }}
         >
           <div className="flex items-center space-x-2.5">
@@ -75,5 +87,5 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

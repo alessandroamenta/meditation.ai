@@ -21,7 +21,7 @@ interface DashboardNavProps {
 export function DashboardNav({ items }: DashboardNavProps) {
   const path = usePathname();
   const [credits, setCredits] = useState(0);
-  const [subscriptionPlan, setSubscriptionPlan] = useState('');
+  const [subscriptionPlan, setSubscriptionPlan] = useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -67,7 +67,7 @@ export function DashboardNav({ items }: DashboardNavProps) {
                   className={cn(
                     "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
                     path === item.href ? "bg-accent" : "transparent",
-                    item.disabled && "cursor-not-allowed opacity-80"
+                    item.disabled && "cursor-not-allowed opacity-80",
                   )}
                 >
                   <Icon className="mr-2 size-4" />
@@ -86,12 +86,15 @@ export function DashboardNav({ items }: DashboardNavProps) {
               "group flex items-center rounded-md px-4 py-3 text-base font-medium text-white",
               credits === 0 && subscriptionPlan === "Free Trial"
                 ? "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                : "bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                : "bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600",
             )}
           >
             <Icons.topup className="mr-2 size-4 text-white" />
             {credits === 0 && subscriptionPlan === "Free Trial" ? (
-              <span className="whitespace-nowrap"> <span className="font-bold">0</span> credits left. Upgrade!</span>
+              <span className="whitespace-nowrap">
+                {" "}
+                <span className="font-bold">0</span> credits left. Upgrade!
+              </span>
             ) : (
               <span className="whitespace-nowrap">
                 You have <span className="font-bold">{credits}</span> credits
@@ -104,7 +107,7 @@ export function DashboardNav({ items }: DashboardNavProps) {
       <div className="mt-auto">
         <Button
           onClick={() => useFeedbackModal.getState().onOpen()}
-          className="group fixed bottom-28 left-30 flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+          className="left-30 group fixed bottom-28 flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
           style={{
             zIndex: 9999,
           }}

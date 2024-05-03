@@ -16,6 +16,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Cron job scheduled successfully" });
   } catch (error) {
     console.error("Error scheduling cron job:", error);
-    return NextResponse.json({ error: "Failed to schedule cron job" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to schedule cron job" },
+      { status: 500 },
+    );
   }
 }

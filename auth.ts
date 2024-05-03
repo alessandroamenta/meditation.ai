@@ -6,7 +6,10 @@ import { env } from "@/env.mjs";
 import { createClient } from "@supabase/supabase-js";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL || "", env.SUPABASE_SERVICE_ROLE_KEY || "");
+const supabase = createClient(
+  env.NEXT_PUBLIC_SUPABASE_URL || "",
+  env.SUPABASE_SERVICE_ROLE_KEY || "",
+);
 
 export const {
   handlers: { GET, POST },
@@ -40,21 +43,21 @@ export const {
     }),
   ],
   callbacks: {
-      async session({ token, session }) {
-        if (session?.user) {
-          if (token.sub) {
-            session.user.id = token.sub;
-          }
-          if (token.provider === "twitter") {
-            session.user.username = token.email; // Assign username to session.user.username
-          } else if (token.email) {
-            session.user.email = token.email;
-          }
-          session.user.name = token.name;
-          session.user.image = token.picture;
+    async session({ token, session }) {
+      if (session?.user) {
+        if (token.sub) {
+          session.user.id = token.sub;
         }
-        return session;
-      },
+        if (token.provider === "twitter") {
+          session.user.username = token.email; // Assign username to session.user.username
+        } else if (token.email) {
+          session.user.email = token.email;
+        }
+        session.user.name = token.name;
+        session.user.image = token.picture;
+      }
+      return session;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;

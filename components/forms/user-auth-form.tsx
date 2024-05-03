@@ -13,10 +13,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 import { Icons } from "@/components/shared/icons";
 import { createClient } from "@supabase/supabase-js";
-import { randomString } from '@/lib/utils';
+import { randomString } from "@/lib/utils";
 import { env } from "@/env.mjs";
-
-
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   type?: string;
@@ -35,7 +33,8 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
-  const [isTwitterLoading, setIsTwitterLoading] = React.useState<boolean>(false); // New state variable
+  const [isTwitterLoading, setIsTwitterLoading] =
+    React.useState<boolean>(false); // New state variable
   const [showCodeInput, setShowCodeInput] = React.useState<boolean>(false);
   const [email, setEmail] = React.useState<string>("");
 
@@ -44,7 +43,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || ""
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || "",
   );
   async function onSubmit(data: FormData) {
     setIsLoading(true);
@@ -73,7 +72,8 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
 
         return toast({
           title: "Check your email",
-          description: "We sent you a magic link. Please click on it to sign in.",
+          description:
+            "We sent you a magic link. Please click on it to sign in.",
         });
       } catch (error) {
         setIsLoading(false);
@@ -94,9 +94,9 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
           token: data.code ?? "",
           type: "email",
         });
-      
+
         setIsLoading(false);
-      
+
         if (error) {
           return toast({
             title: "Something went wrong.",
@@ -104,7 +104,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
             variant: "destructive",
           });
         }
-      
+
         // Sign in the user using the `signIn` function
         const result = await signIn("credentials", {
           redirect: false,
@@ -112,7 +112,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
           callbackUrl: "/dashboard",
         });
         console.log("Sign-in result:", result);
-      
+
         if (result?.error) {
           return toast({
             title: "Something went wrong.",
@@ -120,7 +120,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
             variant: "destructive",
           });
         }
-      
+
         // Redirect to the dashboard after successful login
         router.push("/dashboard");
       } catch (error) {

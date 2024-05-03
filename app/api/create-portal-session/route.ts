@@ -5,15 +5,16 @@ import { createClient } from "@supabase/supabase-js";
 import { env } from "@/env.mjs";
 
 const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-  );
-  
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+);
 
 export async function POST(request: Request) {
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
-    return new NextResponse(JSON.stringify({ error: "Not authorized" }), { status: 401 });
+    return new NextResponse(JSON.stringify({ error: "Not authorized" }), {
+      status: 401,
+    });
   }
 
   const userId = session.user.id;
@@ -27,7 +28,12 @@ export async function POST(request: Request) {
       .single();
 
     if (!user || !user.stripeCustomerId) {
-      return new NextResponse(JSON.stringify({ error: "User not found or missing Stripe customer ID" }), { status: 404 });
+      return new NextResponse(
+        JSON.stringify({
+          error: "User not found or missing Stripe customer ID",
+        }),
+        { status: 404 },
+      );
     }
 
     const portalSession = await stripe.billingPortal.sessions.create({
@@ -40,7 +46,7 @@ export async function POST(request: Request) {
     console.error("Error creating Customer Portal session:", error);
     return NextResponse.json(
       { error: "Failed to create Customer Portal session" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

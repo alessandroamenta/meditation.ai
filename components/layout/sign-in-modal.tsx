@@ -43,12 +43,14 @@ export const SignInModal = () => {
             onClick={() => {
               setSignInClicked(true);
               setSelectedProvider("google");
-              signIn("google", { redirect: true, callbackUrl: "/dashboard" })
-                .then(() =>
-                  setTimeout(() => {
-                    signInModal.onClose();
-                  }, 1000)
-                );
+              signIn("google", {
+                redirect: true,
+                callbackUrl: "/dashboard",
+              }).then(() =>
+                setTimeout(() => {
+                  signInModal.onClose();
+                }, 1000),
+              );
             }}
           >
             {signInClicked && selectedProvider === "google" ? (
@@ -64,12 +66,14 @@ export const SignInModal = () => {
             onClick={() => {
               setSignInClicked(true);
               setSelectedProvider("twitter");
-              signIn("twitter", { redirect: true, callbackUrl: "/dashboard" })
-                .then(() =>
-                  setTimeout(() => {
-                    signInModal.onClose();
-                  }, 1000)
-                );
+              signIn("twitter", {
+                redirect: true,
+                callbackUrl: "/dashboard",
+              }).then(() =>
+                setTimeout(() => {
+                  signInModal.onClose();
+                }, 1000),
+              );
             }}
           >
             {signInClicked && selectedProvider === "twitter" ? (

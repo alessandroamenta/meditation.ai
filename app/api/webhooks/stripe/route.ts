@@ -7,7 +7,7 @@ import { dispatchCreditsUpdatedEvent } from "@/lib/events";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "",
 );
 
 export async function POST(req: Request) {
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      env.STRIPE_WEBHOOK_SECRET
+      env.STRIPE_WEBHOOK_SECRET,
     );
   } catch (error) {
     console.error("Error constructing Stripe event:", error);
@@ -44,12 +44,13 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
+      session.subscription as string,
     );
-  
+
     const proPlanPriceId = env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PLAN_ID;
-    const credits = subscription.items.data[0].price.id === proPlanPriceId ? 30 : 3;
-  
+    const credits =
+      subscription.items.data[0].price.id === proPlanPriceId ? 30 : 3;
+
     await supabase
       .schema("next_auth")
       .from("users")
@@ -59,12 +60,15 @@ export async function POST(req: Request) {
         stripeCustomerId: subscription.customer as string,
         stripePriceId: subscription.items.data[0].price.id,
         stripeCurrentPeriodEnd: new Date(
-          subscription.current_period_end * 1000
+          subscription.current_period_end * 1000,
         ),
-        subscriptionPlan: subscription.items.data[0].price.id === proPlanPriceId ? "Pro Plan" : "Free Trial",
+        subscriptionPlan:
+          subscription.items.data[0].price.id === proPlanPriceId
+            ? "Pro Plan"
+            : "Free Trial",
       })
       .eq("id", userId);
-      dispatchCreditsUpdatedEvent();
+    dispatchCreditsUpdatedEvent();
   }
 
   if (event.type === "customer.subscription.deleted") {

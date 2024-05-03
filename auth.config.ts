@@ -1,7 +1,7 @@
-import Google from "next-auth/providers/google"
-import { env } from "@/env.mjs"
+import Google from "next-auth/providers/google";
+import { env } from "@/env.mjs";
 
-import type { NextAuthConfig } from "next-auth"
+import type { NextAuthConfig } from "next-auth";
 // import { siteConfig } from "@/config/site"
 // import { getUserByEmail } from "@/lib/user";
 // import MagicLinkEmail from "@/emails/magic-link-email"
@@ -50,4 +50,4 @@ export default {
     //   },
     // }),
   ],
-} satisfies NextAuthConfig
+} satisfies NextAuthConfig;

@@ -1,12 +1,15 @@
-import { CardSkeleton } from "@/components/shared/card-skeleton"
-import { DashboardHeader } from "@/components/dashboard/header"
-import { DashboardShell } from "@/components/dashboard/shell"
-import { Button } from "@/components/ui/button"
+import { CardSkeleton } from "@/components/shared/card-skeleton";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { DashboardShell } from "@/components/dashboard/shell";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardLoading() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Hi!" text="Ready to get some headspace? Create any meditation with AI.">
+      <DashboardHeader
+        heading="Hi!"
+        text="Ready to get some headspace? Create any meditation with AI."
+      >
         {/*<Button>Fake button</Button>*/}
       </DashboardHeader>
       <div className="divide-border-200 divide-y rounded-md border">
@@ -16,5 +19,5 @@ export default function DashboardLoading() {
         <CardSkeleton />
       </div>
     </DashboardShell>
-  )
+  );
 }
