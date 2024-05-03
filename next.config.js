@@ -24,6 +24,7 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
   },
+  transpilePackages: ['fluent-ffmpeg'],
 }
 
 const withContentlayer = createContentlayerPlugin({
