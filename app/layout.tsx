@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 
 import { fontHeading, fontSans, fontUrban } from "@/assets/fonts";
-import { Analytics } from "@/components/analytics";
+import { Analytics } from '@vercel/analytics/react';
 import { ModalProvider } from "@/components/modal-provider";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { Toaster } from "@/components/ui/toaster";
