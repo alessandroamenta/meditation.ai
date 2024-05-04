@@ -3,10 +3,11 @@ import { stripe } from "@/lib/stripe";
 import { supabase } from "@/lib/supabase";
 import { SubscriptionPlan } from "types";
 import { env } from "@/env.mjs";
+import { UserSubscriptionPlan } from "types";
 
 export async function getUserSubscriptionPlan(
   userId: string,
-): Promise<SubscriptionPlan> {
+): Promise<UserSubscriptionPlan> {
   const { data: user, error } = await supabase
     .schema("next_auth")
     .from("users")
@@ -31,41 +32,47 @@ export async function getUserSubscriptionPlan(
       ? user.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now()
       : false);
 
-  const plan = {
-    title: user.subscriptionPlan,
-    description:
-      user.subscriptionPlan === "Pro Plan"
-        ? "Unlock Advanced Features"
-        : "For Trying it out",
-    benefits:
-      user.subscriptionPlan === "Pro Plan"
-        ? [
-            "Up to 30 monthly generations",
-            "Meditation library to replay saved sessions",
-            "Priority access to new features",
-            "Customer support",
-          ]
-        : [
-            "Up to 3 monthly generations",
-            "Meditation library to replay saved sessions",
-          ],
-    limitations:
-      user.subscriptionPlan === "Pro Plan"
-        ? []
-        : ["No priority access to new features.", "Limited customer support"],
-    prices: {
-      monthly: user.subscriptionPlan === "Pro Plan" ? 10 : 0,
-      yearly: 0,
-    },
-    stripeIds: {
-      monthly:
-        user.subscriptionPlan === "Pro Plan"
-          ? env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PLAN_ID
-          : null,
-      yearly: null,
-    },
-  };
-
-  console.log("Subscription plan:", plan);
-  return plan;
+      const plan: UserSubscriptionPlan = {
+        title: user.subscriptionPlan,
+        description:
+          user.subscriptionPlan === "Pro Plan"
+            ? "Unlock Advanced Features"
+            : "For Trying it out",
+        benefits:
+          user.subscriptionPlan === "Pro Plan"
+            ? [
+                "Up to 30 monthly generations",
+                "Meditation library to replay saved sessions",
+                "Priority access to new features",
+                "Customer support",
+              ]
+            : [
+                "Up to 3 monthly generations",
+                "Meditation library to replay saved sessions",
+              ],
+        limitations:
+          user.subscriptionPlan === "Pro Plan"
+            ? []
+            : ["No priority access to new features.", "Limited customer support"],
+        prices: {
+          monthly: user.subscriptionPlan === "Pro Plan" ? 10 : 0,
+          yearly: 0,
+        },
+        stripeIds: {
+          monthly:
+            user.subscriptionPlan === "Pro Plan"
+              ? env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PLAN_ID
+              : null,
+          yearly: null,
+        },
+        stripeCustomerId: user.stripeCustomerId,
+        stripeSubscriptionId: user.stripeSubscriptionId,
+        stripePriceId: user.stripePriceId,
+        stripeCurrentPeriodEnd: user.stripeCurrentPeriodEnd,
+        isPaid: isPaid,
+        interval: user.stripePriceId ? "month" : null,
+      };
+    
+      console.log("Subscription plan:", plan);
+      return plan;
 }
