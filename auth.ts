@@ -49,7 +49,7 @@ export const {
           session.user.id = token.sub;
         }
         if (token.provider === "twitter") {
-          session.user.username = token.email; // Assign username to session.user.username
+          session.user.name = token.email; // Assign username to session.user.username
         } else if (token.email) {
           session.user.email = token.email;
         }
