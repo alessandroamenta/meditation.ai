@@ -153,7 +153,7 @@ const MeditationsList: React.FC<MeditationsListProps> = ({
         ) : meditations.length === 0 ? (
           <div className="text-center">
             <p className="text-lg">
-              You haven't generated any meditations yet. 😌🌿
+              You haven&apos;t generated any meditations yet. 😌🌿
             </p>
             <p className="text-lg">
               Head over to the dashboard, create your first meditation, and
