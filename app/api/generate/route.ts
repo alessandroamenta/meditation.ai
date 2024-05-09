@@ -170,3 +170,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to generate meditation. Please try again.' }, { status: 500 });
   }
 }
+
+export const runtime = "edge"
