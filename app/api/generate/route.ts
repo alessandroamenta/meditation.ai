@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     }
 
     console.log('Sending request to generate meditation');
-    const response = await fetch("http://localhost:8000/generate", {
+    const response = await fetch("https://dora-ai.onrender.com/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     while (!audioData && !audioGenerationFailed) {
       await new Promise((resolve) => setTimeout(resolve, 5000));
   
-      const audioResponse = await fetch("http://localhost:8000/audio");
+      const audioResponse = await fetch("https://dora-ai.onrender.com/audio");
       if (audioResponse.ok) {
         const contentType = audioResponse.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
