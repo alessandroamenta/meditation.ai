@@ -122,6 +122,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
         },
         body: JSON.stringify(formData),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
         if (
@@ -133,12 +134,31 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       } else {
-        const result = await response.json();
-        console.log("Received API response:", result);
-        dispatchCreditsUpdatedEvent();
-        const meditationId = result.meditationId;
-        setAudioUrl(audioUrl);
-        onMeditationGenerated(meditationId);
+        const reader = response.body?.getReader();
+        if (reader) {
+          const decoder = new TextDecoder();
+          let meditationId = "";
+
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+
+            for (const line of lines) {
+              if (line.startsWith("Meditation ID:")) {
+                meditationId = line.split(":")[1].trim();
+              } else if (line.startsWith("Meditation generated and stored successfully")) {
+                console.log("Meditation generated successfully");
+                dispatchCreditsUpdatedEvent();
+                onMeditationGenerated(meditationId);
+              } else {
+                console.log("Progress:", line);
+              }
+            }
+          }
+        }
       }
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
