@@ -70,6 +70,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
     Record<string, HTMLAudioElement>
   >({});
   const [isOutOfCredits, setIsOutOfCredits] = useState(false);
+  const [streamingMessage, setStreamingMessage] = useState("");
 
   useEffect(() => {
     const fetchVoiceSampleUrls = async () => {
@@ -113,6 +114,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
+    setStreamingMessage("");
     console.log("Sending form data:", formData);
     try {
       const response = await fetch("/api/generate", {
@@ -133,12 +135,24 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       } else {
-        const result = await response.json();
-        console.log("Received API response:", result);
-        dispatchCreditsUpdatedEvent();
-        const meditationId = result.meditationId;
-        setAudioUrl(audioUrl);
-        onMeditationGenerated(meditationId);
+        const reader = response.body?.getReader();
+        if (reader) {
+          const decoder = new TextDecoder("utf-8");
+          let meditationId = "";
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            setStreamingMessage((prevMessage) => prevMessage + chunk);
+            if (chunk.includes("Meditation ID:")) {
+              meditationId = chunk.split("Meditation ID:")[1].trim();
+            }
+          }
+          dispatchCreditsUpdatedEvent();
+          onMeditationGenerated(meditationId);
+        } else {
+          throw new Error("Failed to read streaming response");
+        }
       }
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
@@ -292,29 +306,30 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
           </div>
         </div>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? (
-            <div className="flex items-center justify-center">
-              <Oval
-                height={20}
-                width={20}
-                color="#ffffff"
-                wrapperStyle={{}}
-                wrapperClass=""
-                visible={true}
-                ariaLabel="oval-loading"
-                secondaryColor="#cccccc"
-                strokeWidth={4}
-                strokeWidthSecondary={4}
-              />
-              <span className="ml-2">
-                Creating your meditation...just a few secs, breath and relax🧘‍♀️✨
-              </span>
-            </div>
-          ) : (
-            "Generate Meditation"
-          )}
-        </Button>
-        {errorMessage && <p>{errorMessage}</p>}
+        {isLoading ? (
+          <div className="flex items-center justify-center">
+            <Oval
+              height={20}
+              width={20}
+              color="#ffffff"
+              wrapperStyle={{}}
+              wrapperClass=""
+              visible={true}
+              ariaLabel="oval-loading"
+              secondaryColor="#cccccc"
+              strokeWidth={4}
+              strokeWidthSecondary={4}
+            />
+            <span className="ml-2">
+              Creating your meditation...just a few secs, breath and relax🧘‍♀️✨
+            </span>
+          </div>
+        ) : (
+          "Generate Meditation"
+        )}
+      </Button>
+      {streamingMessage && <p>{streamingMessage}</p>}
+      {errorMessage && <p>{errorMessage}</p>}
       </form>
       <OutOfCreditsModal
         isOpen={isOutOfCredits}
