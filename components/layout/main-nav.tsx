@@ -7,7 +7,6 @@ import { useSelectedLayoutSegment } from "next/navigation";
 import { MainNavItem } from "types";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
-import { Icons } from "@/components/shared/icons";
 import { MobileNav } from "@/components/layout/mobile-nav";
 
 interface MainNavProps {
@@ -40,9 +39,7 @@ export function MainNav({ items, children }: MainNavProps) {
   return (
     <div className="flex gap-6 md:gap-10">
       <Link href="/dashboard" className="hidden items-center space-x-2 md:flex">
-        <span className="hidden font-urban text-xl font-bold sm:inline-block">
-          {siteConfig.name}
-        </span>
+        <span className="font-urban text-xl font-bold">{siteConfig.name}</span>
       </Link>
       {items?.length ? (
         <nav className="hidden gap-6 md:flex">
@@ -64,11 +61,10 @@ export function MainNav({ items, children }: MainNavProps) {
         </nav>
       ) : null}
       <button
-        className="flex items-center space-x-2 md:hidden"
+        className="md:hidden"
         onClick={toggleMobileMenu}
       >
-        {showMobileMenu ? <Icons.close /> : <Icons.logo />}
-        <span className="font-bold">Menu</span>
+        <span className="font-bold">{siteConfig.name}</span>
       </button>
       {showMobileMenu && items && (
         <MobileNav items={items}>{children}</MobileNav>
