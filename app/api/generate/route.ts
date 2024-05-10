@@ -9,6 +9,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
+const secretToken = process.env.SECRET_TOKEN;
+
 export async function POST(req: Request) {
   console.log('Received request to generate meditation');
   const { aiProvider, duration, guidanceLevel, ttsProvider, voice, meditationFocus } = await req.json();
@@ -47,11 +49,17 @@ export async function POST(req: Request) {
     }
 
     console.log('Sending request to generate meditation');
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (secretToken) {
+      headers["X-Secret-Token"] = secretToken;
+    }
+
     fetch("https://dora-ai.onrender.com/generate", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         aiProvider,
         duration,
