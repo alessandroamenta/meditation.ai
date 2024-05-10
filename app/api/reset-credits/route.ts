@@ -7,6 +7,14 @@ const supabase = createClient(
 );
 
 export async function POST(request: Request) {
+  const cronSecret = request.headers.get("Authorization");
+  if (cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.log("Unauthorized access attempt");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  console.log("Cron job started");
+
   try {
     const { data: users, error } = await supabase
       .schema("next_auth")
@@ -20,6 +28,8 @@ export async function POST(request: Request) {
         { status: 500 },
       );
     }
+
+    console.log(`Found ${users.length} users`);
 
     const currentDate = new Date();
     const updatePromises = users.map(async (user) => {
@@ -43,11 +53,13 @@ export async function POST(request: Request) {
           .from("users")
           .update({ credits, lastCreditReset: currentDate.toISOString() })
           .eq("id", user.id);
+        console.log(`Reset credits for user ${user.id}`);
       }
     });
 
     await Promise.all(updatePromises);
 
+    console.log("Cron job completed successfully");
     return NextResponse.json({ message: "Credits reset successfully" });
   } catch (error) {
     console.error("Error resetting credits:", error);
