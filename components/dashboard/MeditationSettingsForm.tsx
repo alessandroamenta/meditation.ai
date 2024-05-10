@@ -328,7 +328,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
           "Generate Meditation"
         )}
       </Button>
-      {streamingMessage && <p>{streamingMessage}</p>}
+      {/*{streamingMessage && <p>{streamingMessage}</p>}*/}
       {errorMessage && <p>{errorMessage}</p>}
       </form>
       <OutOfCreditsModal
