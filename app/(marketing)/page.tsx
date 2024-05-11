@@ -78,14 +78,8 @@ export default async function IndexPage() {
             <Link
               href="/login"
               className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "px-4",
-              )}
-            >
-              <p>
-                <span className="hidden sm:inline-block">Try for free</span>
-              </p>
-            </Link>
+                buttonVariants({ variant: "outline", size: "lg" }))}
+            >Try it</Link>
           </div>
         </div>
       </section>
