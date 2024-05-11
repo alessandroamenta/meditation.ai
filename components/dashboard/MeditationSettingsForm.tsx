@@ -107,7 +107,17 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
   }, [voiceSampleUrls]);
 
   const handleToggleChange = (name: string, value: string) => {
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    setFormData((prevFormData) => {
+      const updatedFormData = { ...prevFormData, [name]: value };
+
+      // Set default voice based on the selected TTS provider
+      if (name === "ttsProvider") {
+        updatedFormData.voice =
+          value === "openai" ? "alloy" : "Qe9WSybioZxssVEwlBSo";
+      }
+
+      return updatedFormData;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -295,7 +305,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
                 <button
                   type="button"
                   onClick={() =>
-                    handlePlayVoiceSample(option.label, formData.ttsProvider)
+                    handlePlayVoiceSample(option.value, formData.ttsProvider)
                   }
                   className="ml-2 text-sm text-gray-500 hover:text-gray-700"
                 >
@@ -306,30 +316,30 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
           </div>
         </div>
         <Button type="submit" disabled={isLoading}>
-        {isLoading ? (
-          <div className="flex items-center justify-center">
-            <Oval
-              height={20}
-              width={20}
-              color="#ffffff"
-              wrapperStyle={{}}
-              wrapperClass=""
-              visible={true}
-              ariaLabel="oval-loading"
-              secondaryColor="#cccccc"
-              strokeWidth={4}
-              strokeWidthSecondary={4}
-            />
-            <span className="ml-2">
-              Creating your meditation...just a few secs, breath and relax🧘‍♀️✨
-            </span>
-          </div>
-        ) : (
-          "Generate Meditation"
-        )}
-      </Button>
-      {/*{streamingMessage && <p>{streamingMessage}</p>}*/}
-      {errorMessage && <p>{errorMessage}</p>}
+          {isLoading ? (
+            <div className="flex items-center justify-center">
+              <Oval
+                height={20}
+                width={20}
+                color="#ffffff"
+                wrapperStyle={{}}
+                wrapperClass=""
+                visible={true}
+                ariaLabel="oval-loading"
+                secondaryColor="#cccccc"
+                strokeWidth={4}
+                strokeWidthSecondary={4}
+              />
+              <span className="ml-2">
+                Creating your meditation...just a few secs, breath and relax🧘‍♀️✨
+              </span>
+            </div>
+          ) : (
+            "Generate Meditation"
+          )}
+        </Button>
+        {/*{streamingMessage && <p>{streamingMessage}</p>}*/}
+        {errorMessage && <p>{errorMessage}</p>}
       </form>
       <OutOfCreditsModal
         isOpen={isOutOfCredits}
