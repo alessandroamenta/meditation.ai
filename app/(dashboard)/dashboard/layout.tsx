@@ -24,7 +24,7 @@ export default async function DashboardLayout({
       <NavBar user={user} items={dashboardConfig.mainNav} scroll={false} />
 
       <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr]">
-        <aside className="hidden w-[200px] flex-col md:flex">
+        <aside className="w-full md:w-[200px] md:flex-col">
           <DashboardNav items={dashboardConfig.sidebarNav} />
         </aside>
         <main className="flex w-full flex-1 flex-col overflow-hidden">

@@ -27,6 +27,7 @@ import {
   Send,
   MessageSquareMore,
   SquarePlus,
+  Menu
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -109,4 +110,5 @@ export const Icons = {
   topup: SquarePlus,
   user: User,
   warning: AlertTriangle,
+  menu: Menu,
 };
