@@ -22,12 +22,12 @@ const voiceOptions: Record<string, { label: string; value: string }[]> = {
     { label: "Shimmer", value: "shimmer" },
   ],
   elevenlabs: [
-    { label: "Vincent", value: "Qe9WSybioZxssVEwlBSo" },
-    { label: "Joanne", value: "RrkF2QZOPA1PyW4EamJj" },
-    { label: "Stella", value: "h9wTb50iJC9oQuw5A37H" },
-    { label: "Javier", value: "h415g7h7bSwQrn1qw4ar" },
-    { label: "Gemma", value: "fqQpqTuOIBHOwbVaVZP3" },
-    { label: "Tim", value: "XPzm47Wm41jCR5gentJy" },
+    { label: "Vincent", value: "Vincent" },
+    { label: "Joanne", value: "Joanne" },
+    { label: "Stella", value: "Stella" },
+    { label: "Javier", value: "Javier" },
+    { label: "Gemma", value: "Gemma" },
+    { label: "Tim", value: "Tim" },
   ],
 };
 
@@ -80,7 +80,9 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        //console.log("Fetched voice sample URLs:", data);
         setVoiceSampleUrls(data);
+        //console.log("Voice Sample URLs:", data);
       } catch (error) {
         console.error("Error fetching voice sample URLs:", error);
       }
@@ -92,17 +94,17 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
   useEffect(() => {
     const preloadAudio = async () => {
       const audioElements: Record<string, HTMLAudioElement> = {};
-
+  
       for (const provider in voiceSampleUrls) {
         for (const sample of voiceSampleUrls[provider]) {
           const audio = new Audio(sample.url);
           audioElements[`${provider}-${sample.voiceId}`] = audio;
         }
       }
-
+      //console.log("Preloaded audio elements:", audioElements);
       setPreloadedAudio(audioElements);
     };
-
+  
     preloadAudio();
   }, [voiceSampleUrls]);
 
@@ -173,16 +175,27 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
   };
 
   const handlePlayVoiceSample = (voiceId: string, ttsProvider: string) => {
-    const audioKey = `${ttsProvider}-${voiceId}`;
-    const audio = preloadedAudio[audioKey];
-
-    if (audio) {
+    //console.log("Playing voice sample:", voiceId, ttsProvider);
+    const audioUrl = voiceSampleUrls[ttsProvider].find(
+      (sample) => sample.voiceId.toLowerCase() === voiceId.toLowerCase()
+    )?.url;
+  
+    if (audioUrl) {
       if (playingVoiceSample) {
         playingVoiceSample.pause();
+        playingVoiceSample.currentTime = 0;
       }
-
-      audio.play();
+  
+      const audio = new Audio(audioUrl);
+      audio.play().then(() => {
+      //console.log("Audio playback started successfully");
+      }).catch((error) => {
+      //console.error("Error playing audio:", error);
+      });
       setPlayingVoiceSample(audio);
+      //console.log("Updated playing voice sample:", audio);
+    } else {
+      console.warn("Audio URL not found for voice ID:", voiceId);
     }
   };
 

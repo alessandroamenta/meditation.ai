@@ -73,6 +73,6 @@ export async function getUserSubscriptionPlan(
         interval: user.stripePriceId ? "month" : null,
       };
     
-      console.log("Subscription plan:", plan);
+      //console.log("Subscription plan:", plan);
       return plan;
 }

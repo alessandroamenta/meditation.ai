@@ -22,7 +22,7 @@ export default async function BillingPage() {
 
   const userId = user.id;
   const subscriptionPlan = await getUserSubscriptionPlan(userId);
-  console.log("Subscription plan in BillingPage:", subscriptionPlan);
+  //console.log("Subscription plan in BillingPage:", subscriptionPlan);
 
   return (
     <DashboardShell>

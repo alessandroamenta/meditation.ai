@@ -65,7 +65,7 @@ export const {
         token.email = user.email;
         token.picture = user.image;
       }
-      console.log("this is the token", token);
+      //console.log("this is the token", token);
       return token;
     },
   },
