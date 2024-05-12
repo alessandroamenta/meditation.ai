@@ -12,7 +12,7 @@ const aiProviderOptions = ["openai", "anthropic"];
 const durationOptions = ["2-5min", "5-10min", "10+min"];
 const guidanceOptions = ["low", "medium", "high"];
 const ttsProviderOptions = ["openai", "elevenlabs"];
-const voiceOptions: Record<string, { label: string; value: string }[]> = {
+const voiceOptions: Record<string, { label: string; value: string; id?: string }[]> = {
   openai: [
     { label: "Alloy", value: "alloy" },
     { label: "Echo", value: "echo" },
@@ -22,12 +22,12 @@ const voiceOptions: Record<string, { label: string; value: string }[]> = {
     { label: "Shimmer", value: "shimmer" },
   ],
   elevenlabs: [
-    { label: "Vincent", value: "Vincent" },
-    { label: "Joanne", value: "Joanne" },
-    { label: "Stella", value: "Stella" },
-    { label: "Javier", value: "Javier" },
-    { label: "Gemma", value: "Gemma" },
-    { label: "Tim", value: "Tim" },
+    { label: "Vincent", value: "Qe9WSybioZxssVEwlBSo" },
+    { label: "Joanne", value: "RrkF2QZOPA1PyW4EamJj" },
+    { label: "Stella", value: "h9wTb50iJC9oQuw5A37H" },
+    { label: "Javier", value: "h415g7h7bSwQrn1qw4ar" },
+    { label: "Gemma", value: "fqQpqTuOIBHOwbVaVZP3" },
+    { label: "Tim", value: "XPzm47Wm41jCR5gentJy" },
   ],
 };
 
@@ -111,13 +111,12 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
   const handleToggleChange = (name: string, value: string) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [name]: value };
-
+  
       // Set default voice based on the selected TTS provider
       if (name === "ttsProvider") {
-        updatedFormData.voice =
-          value === "openai" ? "alloy" : "Qe9WSybioZxssVEwlBSo";
+        updatedFormData.voice = value === "openai" ? "alloy" : "Qe9WSybioZxssVEwlBSo";
       }
-
+  
       return updatedFormData;
     });
   };
@@ -127,7 +126,17 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
     setIsLoading(true);
     setErrorMessage("");
     setStreamingMessage("");
-    console.log("Sending form data:", formData);
+    const selectedVoice = voiceOptions[formData.ttsProvider].find(
+      (option) => option.value === formData.voice
+    );
+    const voiceId = selectedVoice?.id || selectedVoice?.value;
+  
+    const requestData = {
+      ...formData,
+      voice: voiceId,
+    };
+  
+    console.log("Sending form data:", requestData);
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -175,27 +184,30 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
   };
 
   const handlePlayVoiceSample = (voiceId: string, ttsProvider: string) => {
-    //console.log("Playing voice sample:", voiceId, ttsProvider);
-    const audioUrl = voiceSampleUrls[ttsProvider].find(
-      (sample) => sample.voiceId.toLowerCase() === voiceId.toLowerCase()
-    )?.url;
+    const voiceLabel = voiceOptions[ttsProvider].find(
+      (voice) => voice.value === voiceId
+    )?.label;
   
-    if (audioUrl) {
-      if (playingVoiceSample) {
-        playingVoiceSample.pause();
-        playingVoiceSample.currentTime = 0;
-      }
+    if (voiceLabel) {
+      const audioUrl = voiceSampleUrls[ttsProvider].find(
+        (sample) => sample.voiceId.toLowerCase() === voiceLabel.toLowerCase()
+      )?.url;
   
-      const audio = new Audio(audioUrl);
-      audio.play().then(() => {
-      //console.log("Audio playback started successfully");
-      }).catch((error) => {
-      //console.error("Error playing audio:", error);
-      });
-      setPlayingVoiceSample(audio);
-      //console.log("Updated playing voice sample:", audio);
+      if (audioUrl) {
+        if (playingVoiceSample) {
+          playingVoiceSample.pause();
+          playingVoiceSample.currentTime = 0;
+        }
+  
+        const audio = new Audio(audioUrl);
+        audio.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+        setPlayingVoiceSample(audio);
+      } else {
+        console.warn("Audio URL not found for voice label:", voiceLabel);    }
     } else {
-      console.warn("Audio URL not found for voice ID:", voiceId);
+      console.warn("Voice label not found for voice ID:", voiceId);
     }
   };
 
