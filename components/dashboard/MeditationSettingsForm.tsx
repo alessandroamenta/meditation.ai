@@ -217,7 +217,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
         onSubmit={handleSubmit}
         className="grid max-w-full gap-4 rounded-lg border border-gray-200 p-6 dark:border-gray-800 sm:max-w-none"
       >
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
           <Label htmlFor="ai-provider">🤖 AI Model</Label>
           <div className="grid grid-cols-2 gap-4">
             {aiProviderOptions.map((option) => (
@@ -233,7 +233,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
           <Label htmlFor="duration">⏳ Meditation Length</Label>
           <div className="grid grid-cols-3 gap-4">
             {durationOptions.map((option) => (
@@ -249,7 +249,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
           <Label htmlFor="meditation-focus">💆‍♂️ Meditation Focus</Label>
           <select
             id="meditation-focus"
@@ -276,7 +276,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
             </option>
           </select>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
           <Label htmlFor="guidance-level">🧘‍♀️ Guidance Amount</Label>
           <div className="grid grid-cols-3 gap-4">
             {guidanceOptions.map((option) => (
@@ -294,7 +294,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
           <Label htmlFor="tts-provider">🎙️ Voice Provider</Label>
           <div className="grid grid-cols-2 gap-4">
             {ttsProviderOptions.map((option) => (
@@ -312,7 +312,7 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
           <Label htmlFor="voice">🗣️ Voice Selection</Label>
           <div className="grid grid-cols-3 gap-4">
             {voiceOptions[formData.ttsProvider].map((option) => (
