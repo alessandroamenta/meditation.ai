@@ -215,8 +215,8 @@ const MeditationSettingsForm: React.FC<MeditationSettingsFormProps> = ({
     <>
       <form
         onSubmit={handleSubmit}
-        className="grid gap-4 rounded-lg border border-gray-200 p-6 dark:border-gray-800"
-      >
+        className="grid gap-4 rounded-lg border border-gray-200 p-6 dark:border-gray-800 max-w-full sm:max-w-none"
+        >
         <div className="flex items-center gap-4">
           <Label htmlFor="ai-provider">🤖 AI Model</Label>
           <div className="grid grid-cols-2 gap-4">
