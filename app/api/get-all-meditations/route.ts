@@ -19,6 +19,7 @@ export async function GET(req: Request) {
 
   try {
     const { data: meditations, error } = await supabase
+      .schema("next_auth")
       .from("meditations")
       .select("id, audio_path, display_name, duration")
       .eq("user_id", userId);
