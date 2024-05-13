@@ -78,6 +78,7 @@ export async function POST(req: Request) {
 
         let audioData: ArrayBuffer | null = null;
         let audioGenerationFailed = false;
+        let audioDuration: string | null = null;
 
         while (!audioData && !audioGenerationFailed) {
           await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -102,6 +103,8 @@ export async function POST(req: Request) {
               audioData = await audioResponse.arrayBuffer();
               console.log('Audio data received');
               controller.enqueue(encoder.encode('Audio data received. Finalizing meditation...\n'));
+              // Extract the audio duration from the response headers
+              audioDuration = audioResponse.headers.get('X-Audio-Duration');
             } else {
               console.error('Unexpected response content type:', contentType);
               controller.enqueue(encoder.encode('Unexpected response from the backend. Please try again.\n'));
@@ -145,7 +148,7 @@ export async function POST(req: Request) {
               user_id: userId,
               audio_path: outputFileName,
               display_name: outputFileName.replace('.mp3', ''),
-              duration: duration,
+              duration: audioDuration,
               created_at: new Date().toISOString(),
             })
             .select('id');
