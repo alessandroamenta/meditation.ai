@@ -143,6 +143,7 @@ export async function POST(req: Request) {
 
           console.log('Inserting meditation into the database');
           const { data: meditationData, error: meditationError } = await supabase
+            .schema('next_auth')
             .from('meditations')
             .insert({
               user_id: userId,

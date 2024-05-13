@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     console.log("User email:", userEmail);
 
     const { error } = await supabase
+      .schema("next_auth")
       .from("feedback")
       .insert({ feedback, email: userEmail });
 
