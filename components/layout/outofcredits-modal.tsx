@@ -28,7 +28,7 @@ export const OutOfCreditsModal: React.FC<OutOfCreditsModalProps> = ({
             will refresh at the start of the next billing cycle. ✨
           </p>
         </div>
-        <div className="flex justify-end bg-secondary/50 px-4 py-4 md:px-16">
+        <div className="flex justify-end bg-secondary/50 p-4 md:px-16">
           <Button variant="default" onClick={onClose}>
             Close
           </Button>

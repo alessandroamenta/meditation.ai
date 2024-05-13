@@ -169,7 +169,7 @@ const MeditationsList: React.FC<MeditationsListProps> = ({
               >
                 <div className="col-span-5 flex items-center gap-2">
                   <PlayIcon
-                    className="h-6 w-6 cursor-pointer text-gray-500 dark:text-gray-400"
+                    className="size-6 cursor-pointer text-gray-500 dark:text-gray-400"
                     onClick={() => handlePlayMeditation(meditation)}
                   />
                   <div className="grid grid-cols-1 gap-1">
@@ -210,8 +210,8 @@ const MeditationsList: React.FC<MeditationsListProps> = ({
                       setEditedMeditationName(meditation.display_name);
                     }}
                   >
-                    <PencilIcon className="h-5 w-5 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500" />
-                    <span className="absolute left-1/2 top-full -translate-x-1/2 transform whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    <PencilIcon className="size-5 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500" />
+                    <span className="absolute left-1/2 top-full -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
                       Rename
                     </span>
                   </button>
@@ -219,8 +219,8 @@ const MeditationsList: React.FC<MeditationsListProps> = ({
                     className="group relative"
                     onClick={() => deleteMeditation(meditation.id)}
                   >
-                    <TrashIcon className="h-5 w-5 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-500" />
-                    <span className="absolute left-1/2 top-full -translate-x-1/2 transform whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    <TrashIcon className="size-5 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-500" />
+                    <span className="absolute left-1/2 top-full -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
                       Delete
                     </span>
                   </button>

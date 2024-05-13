@@ -35,7 +35,7 @@ const MeditationSection: React.FC = () => {
         onMeditationGenerated={handleMeditationGenerated}
       />
       {hasNewAudio && (
-        <div className="fixed bottom-0 left-1/2 mx-auto h-auto max-w-md -translate-x-1/2 transform rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900">
+        <div className="fixed bottom-0 left-1/2 mx-auto h-auto max-w-md -translate-x-1/2 rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900">
           <MeditationPlayer
             audioUrl={audioUrl}
             onSave={handleSaveMeditation}

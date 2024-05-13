@@ -60,13 +60,17 @@ export function DashboardNav({ items }: DashboardNavProps) {
     <div>
       {/* Mobile menu button */}
       <div className="md:hidden">
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          className="fixed bottom-4 right-4 z-50 rounded-full bg-indigo-600 p-2 text-white shadow-lg"
-        >
-          <Icons.menu className="size-6" />
-        </Button>
-      </div>
+          <Button
+            onClick={() => setIsOpen(!isOpen)}
+            className="fixed bottom-4 right-4 z-50 rounded-full bg-indigo-600 p-2 text-white shadow-lg"
+          >
+            {isOpen ? (
+              <Icons.close className="size-6" />
+            ) : (
+              <Icons.menu className="size-6" />
+            )}
+          </Button>
+        </div>
 
       {/* Mobile menu */}
       <div

@@ -65,7 +65,7 @@ export const SubscriptionModal = () => {
               : "Aw, sorry to see you go. 😢 But hey, I'm still super grateful you gave the app a shot! 🙏 Keep using the free version as long as you like, and if there's anything I can do to improve your experience, just hit that feedback button. Cheers! 😊"}
           </p>
         </div>
-        <div className="flex justify-end bg-secondary/50 px-4 py-4 md:px-16">
+        <div className="flex justify-end bg-secondary/50 p-4 md:px-16">
           <Button variant="default" onClick={closeModal}>
             Close
           </Button>

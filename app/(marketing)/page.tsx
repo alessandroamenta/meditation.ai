@@ -11,7 +11,7 @@ export default async function IndexPage() {
   return (
     <>
       <section className="space-y-6 pb-12 pt-16 lg:py-28">
-        <div className="container flex max-w-[64rem] flex-col items-center gap-5 text-center">
+        <div className="container flex max-w-5xl flex-col items-center gap-5 text-center">
           <Link
             href="/login"
             className={cn(
@@ -38,7 +38,7 @@ export default async function IndexPage() {
           </h1>
 
           <p
-            className="max-w-[42rem] animate-fade-up text-balance leading-normal text-muted-foreground opacity-0 sm:text-xl sm:leading-8"
+            className="max-w-2xl animate-fade-up text-balance leading-normal text-muted-foreground opacity-0 sm:text-xl sm:leading-8"
             style={{ animationDelay: "0.35s", animationFillMode: "forwards" }}
           >
             Achieve mental clarity and relaxation with AI-generated guided
