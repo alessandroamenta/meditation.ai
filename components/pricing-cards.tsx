@@ -132,7 +132,7 @@ export function PricingCards({ userId, subscriptionPlan }: PricingCardsProps) {
         {/*Email <a className="font-medium text-primary hover:underline" href="mailto:support@saas-starter.com">support@saas-starter.com</a> for to contact our support team.
         <br />*/}
         <strong>
-          You can test the free subscriptions and won&apos;t be charged. Ever.
+          You can test the free subscription and won&apos;t be charged. Ever.
         </strong>
       </p>
     </section>
