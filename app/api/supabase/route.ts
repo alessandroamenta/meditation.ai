@@ -27,6 +27,7 @@ export async function GET(req: Request) {
   }
   try {
     const { data: meditationData, error: meditationError } = await supabase
+      .schema("next_auth")
       .from("meditations")
       .select("audio_path")
       .eq("id", meditationId)
@@ -88,6 +89,7 @@ export async function DELETE(req: Request) {
 
   try {
     const { data: meditationData, error: meditationError } = await supabase
+      .schema("next_auth")
       .from("meditations")
       .select("audio_path")
       .eq("id", meditationId)
@@ -119,6 +121,7 @@ export async function DELETE(req: Request) {
     // Delete the meditation record from the meditations table
     const { data: deleteMeditationData, error: deleteMeditationError } =
       await supabase
+        .schema("next_auth")
         .from("meditations")
         .delete()
         .eq("id", meditationId)
@@ -170,6 +173,7 @@ export async function PUT(req: Request) {
   try {
     // Update the display_name in the meditations table
     const { data: updateData, error: updateError } = await supabase
+      .schema("next_auth")
       .from("meditations")
       .update({ display_name: newName })
       .eq("id", meditationId)
